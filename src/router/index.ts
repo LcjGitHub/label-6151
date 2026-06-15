@@ -34,6 +34,11 @@ const router = createRouter({
       name: 'search',
       component: () => import('@/views/SearchResultsView.vue'),
     },
+    {
+      path: '/statistics',
+      name: 'coin-statistics',
+      component: () => import('@/views/CoinStatisticsView.vue'),
+    },
   ],
 })
 

@@ -6,6 +6,7 @@ import {
   fetchDynasties,
   fetchDynastyTimeline,
   fetchSimilarCoins,
+  fetchStatistics,
   searchCoins,
 } from '@/api/coins'
 import type { Coin } from '@/types/coin'
@@ -15,6 +16,7 @@ export const coinKeys = {
   all: ['coins'] as const,
   dynasties: ['dynasties'] as const,
   timeline: ['dynasties', 'timeline'] as const,
+  statistics: ['statistics'] as const,
   detail: (id: string) => ['coins', id] as const,
   similar: (id: string) => ['coins', id, 'similar'] as const,
   search: (keyword: string) => ['coins', 'search', keyword] as const,
@@ -86,5 +88,15 @@ export function useSearchQuery(keyword: Ref<string>) {
     queryKey: computed(() => coinKeys.search(keyword.value)),
     queryFn: () => searchCoins(keyword.value),
     enabled: computed(() => keyword.value.trim().length > 0),
+  })
+}
+
+/**
+ * 获取钱币统计概览数据
+ */
+export function useStatisticsQuery() {
+  return useQuery({
+    queryKey: coinKeys.statistics,
+    queryFn: fetchStatistics,
   })
 }

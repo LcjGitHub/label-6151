@@ -1,5 +1,6 @@
 import type { Coin } from '@/types/coin'
 import type { DynastyItem } from '@/types/dynasty'
+import type { CoinStatistics, DynastyCoinCount, MaterialRatio } from '@/types/statistics'
 import coinsData from '@/mock/coins.json'
 import dynastiesData from '@/mock/dynasties.json'
 
@@ -84,4 +85,54 @@ export async function searchCoins(keyword: string): Promise<Coin[]> {
       c.obverse.toLowerCase().includes(kw) ||
       c.reverse.toLowerCase().includes(kw),
   )
+}
+
+/**
+ * 获取钱币统计概览数据
+ * 聚合计算总钱币数量、朝代数量、材质种类数，
+ * 以及各朝代钱币数量分布和各材质占比
+ */
+export async function fetchStatistics(): Promise<CoinStatistics> {
+  await delay(MOCK_DELAY)
+  const coins = coinsData as Coin[]
+
+  const totalCoins = coins.length
+
+  const dynastySet = new Set(coins.map((c) => c.dynasty))
+  const totalDynasties = dynastySet.size
+
+  const materialSet = new Set(coins.map((c) => c.material))
+  const totalMaterials = materialSet.size
+
+  const dynastyCountMap: Record<string, number> = {}
+  const dynastyOrder = (dynastiesData as Omit<DynastyItem, 'coinCount'>[]).map((d) => d.name)
+  for (const coin of coins) {
+    dynastyCountMap[coin.dynasty] = (dynastyCountMap[coin.dynasty] || 0) + 1
+  }
+  const dynastyCounts: DynastyCoinCount[] = dynastyOrder
+    .filter((name) => dynastySet.has(name))
+    .map((name) => ({
+      dynasty: name,
+      count: dynastyCountMap[name] || 0,
+    }))
+
+  const materialCountMap: Record<string, number> = {}
+  for (const coin of coins) {
+    materialCountMap[coin.material] = (materialCountMap[coin.material] || 0) + 1
+  }
+  const materialRatios: MaterialRatio[] = Object.entries(materialCountMap)
+    .map(([material, count]) => ({
+      material,
+      count,
+      ratio: Number(((count / totalCoins) * 100).toFixed(1)),
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  return {
+    totalCoins,
+    totalDynasties,
+    totalMaterials,
+    dynastyCounts,
+    materialRatios,
+  }
 }

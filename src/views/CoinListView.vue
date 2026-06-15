@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { StarFilled, Timer } from '@element-plus/icons-vue'
+import { DataLine, StarFilled, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import { useCoinsQuery, useDynastiesQuery } from '@/composables/useCoinQueries'
@@ -55,6 +55,9 @@ watch(
         <div class="coin-list__header-buttons">
           <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
             朝代年表
+          </el-button>
+          <el-button type="primary" plain :icon="DataLine" @click="router.push('/statistics')">
+            统计概览
           </el-button>
           <el-button
             type="primary"
