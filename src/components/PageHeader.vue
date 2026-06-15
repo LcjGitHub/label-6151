@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { DataLine, StarFilled, Timer, ArrowLeft } from '@element-plus/icons-vue'
+import { DataLine, StarFilled, Timer, ArrowLeft, Clock } from '@element-plus/icons-vue'
 import { useFavorites } from '@/composables/useFavorites'
+import { useRecentViews } from '@/composables/useRecentViews'
 
 interface Props {
   title?: string
@@ -10,9 +11,11 @@ interface Props {
   showTimeline?: boolean
   showFavorites?: boolean
   showStatistics?: boolean
+  showRecentViews?: boolean
   variant?: 'card' | 'plain'
   layout?: 'center' | 'split' | 'left'
   favoriteBadgeCount?: number
+  recentViewsBadgeCount?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,15 +23,22 @@ const props = withDefaults(defineProps<Props>(), {
   showTimeline: false,
   showFavorites: false,
   showStatistics: false,
+  showRecentViews: false,
   variant: 'plain',
   layout: 'center',
 })
 
 const router = useRouter()
 const { count: defaultFavoriteCount } = useFavorites()
+const { count: defaultRecentViewsCount } = useRecentViews()
 
 const favoriteCount = () =>
   props.favoriteBadgeCount !== undefined ? props.favoriteBadgeCount : defaultFavoriteCount.value
+
+const recentViewsCount = () =>
+  props.recentViewsBadgeCount !== undefined
+    ? props.recentViewsBadgeCount
+    : defaultRecentViewsCount.value
 
 function goBack() {
   router.push('/')
@@ -40,6 +50,10 @@ function goTimeline() {
 
 function goFavorites() {
   router.push('/favorites')
+}
+
+function goRecentViews() {
+  router.push('/recent-views')
 }
 
 function goStatistics() {
@@ -98,6 +112,21 @@ function goStatistics() {
               class="page-header__badge"
             />
           </el-button>
+          <el-button
+            v-if="showRecentViews"
+            type="primary"
+            plain
+            :icon="Clock"
+            @click="goRecentViews"
+          >
+            最近浏览
+            <el-badge
+              v-if="recentViewsCount() > 0"
+              :value="recentViewsCount()"
+              :max="99"
+              class="page-header__badge"
+            />
+          </el-button>
           <slot name="extra-actions" />
         </div>
       </div>
@@ -109,6 +138,21 @@ function goStatistics() {
           <el-button v-if="showBack" text @click="goBack"> ← 返回列表 </el-button>
           <el-button v-if="showTimeline" type="primary" plain :icon="Timer" @click="goTimeline">
             朝代年表
+          </el-button>
+          <el-button
+            v-if="showRecentViews"
+            type="primary"
+            plain
+            :icon="Clock"
+            @click="goRecentViews"
+          >
+            最近浏览
+            <el-badge
+              v-if="recentViewsCount() > 0"
+              :value="recentViewsCount()"
+              :max="99"
+              class="page-header__badge"
+            />
           </el-button>
           <slot name="extra" />
         </slot>
@@ -151,6 +195,21 @@ function goStatistics() {
             @click="goFavorites"
           >
             我的收藏
+          </el-button>
+          <el-button
+            v-if="showRecentViews"
+            type="primary"
+            plain
+            :icon="Clock"
+            @click="goRecentViews"
+          >
+            最近浏览
+            <el-badge
+              v-if="recentViewsCount() > 0"
+              :value="recentViewsCount()"
+              :max="99"
+              class="page-header__badge"
+            />
           </el-button>
           <slot name="right" />
         </div>

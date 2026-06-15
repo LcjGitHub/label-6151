@@ -39,6 +39,11 @@ const router = createRouter({
       name: 'coin-statistics',
       component: () => import('@/views/CoinStatisticsView.vue'),
     },
+    {
+      path: '/recent-views',
+      name: 'recent-views',
+      component: () => import('@/views/RecentViewsView.vue'),
+    },
   ],
 })
 

@@ -146,6 +146,7 @@ watch(
       show-timeline
       show-statistics
       show-favorites
+      show-recent-views
     />
 
     <FilterBar

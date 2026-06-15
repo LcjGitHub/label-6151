@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue'
+import { computed, toRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Star, StarFilled, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
@@ -13,6 +13,7 @@ import {
   useAdjacentCoinsQuery,
 } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
+import { useRecentViews } from '@/composables/useRecentViews'
 
 const props = defineProps<{
   id: string
@@ -29,8 +30,19 @@ const { data: sameMaterialCoins, isLoading: sameMaterialLoading } =
 const { data: adjacentIds, isLoading: adjacentLoading } = useAdjacentCoinsQuery(idRef)
 
 const { isFavorite, toggleFavorite } = useFavorites()
+const { addView } = useRecentViews()
 
 const isFavorited = computed(() => (coin.value ? isFavorite(coin.value.id) : false))
+
+watch(
+  () => coin.value,
+  (newCoin) => {
+    if (newCoin) {
+      addView(newCoin.id)
+    }
+  },
+  { immediate: true },
+)
 
 const hasPrev = computed(() => adjacentLoading.value || adjacentIds.value?.prevId != null)
 const hasNext = computed(() => adjacentLoading.value || adjacentIds.value?.nextId != null)
@@ -75,25 +87,27 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 
 <template>
   <div class="coin-detail">
-    <PageHeader layout="left" show-back show-timeline>
-      <el-button
-        text
-        :icon="ArrowLeft"
-        :disabled="!hasPrev"
-        aria-label="上一枚钱币"
-        @click="goPrev"
-      >
-        上一枚
-      </el-button>
-      <el-button
-        text
-        :icon="ArrowRight"
-        :disabled="!hasNext"
-        aria-label="下一枚钱币"
-        @click="goNext"
-      >
-        下一枚
-      </el-button>
+    <PageHeader layout="left" show-back show-timeline show-recent-views>
+      <template #extra>
+        <el-button
+          text
+          :icon="ArrowLeft"
+          :disabled="!hasPrev"
+          aria-label="上一枚钱币"
+          @click="goPrev"
+        >
+          上一枚
+        </el-button>
+        <el-button
+          text
+          :icon="ArrowRight"
+          :disabled="!hasNext"
+          aria-label="下一枚钱币"
+          @click="goNext"
+        >
+          下一枚
+        </el-button>
+      </template>
     </PageHeader>
 
     <div v-if="isLoading" class="coin-detail__loading">
