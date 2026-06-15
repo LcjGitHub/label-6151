@@ -50,19 +50,26 @@ function handleDynastyClick(dynasty: string) {
     />
 
     <div v-else class="dynasty-timeline__list">
-      <div
+      <button
         v-for="(item, index) in timeline"
         :key="item.name"
+        type="button"
         class="dynasty-timeline__item"
         :class="{ 'dynasty-timeline__item--clickable': item.coinCount > 0 }"
+        :disabled="item.coinCount === 0"
+        :aria-label="
+          item.coinCount > 0
+            ? `查看${item.name}朝钱币，共${item.coinCount}枚，年代${formatYear(item.startYear)}至${formatYear(item.endYear)}`
+            : `${item.name}朝，年代${formatYear(item.startYear)}至${formatYear(item.endYear)}，暂无钱币数据`
+        "
         @click="item.coinCount > 0 && handleDynastyClick(item.name)"
       >
-        <div class="dynasty-timeline__index">
+        <div class="dynasty-timeline__index" aria-hidden="true">
           {{ String(index + 1).padStart(2, '0') }}
         </div>
         <div class="dynasty-timeline__info">
           <div class="dynasty-timeline__name">{{ item.name }}</div>
-          <div class="dynasty-timeline__period">
+          <div class="dynasty-timeline__period" aria-hidden="true">
             {{ formatYear(item.startYear) }} — {{ formatYear(item.endYear) }}
           </div>
         </div>
@@ -70,10 +77,10 @@ function handleDynastyClick(dynasty: string) {
           <span class="dynasty-timeline__coins-count">{{ item.coinCount }}</span>
           <span class="dynasty-timeline__coins-label">枚钱币</span>
         </div>
-        <el-icon v-if="item.coinCount > 0" class="dynasty-timeline__arrow">
+        <el-icon v-if="item.coinCount > 0" class="dynasty-timeline__arrow" aria-hidden="true">
           <ArrowRight />
         </el-icon>
-      </div>
+      </button>
     </div>
 
     <footer v-if="timeline && timeline.length > 0" class="dynasty-timeline__footer">
@@ -129,19 +136,33 @@ function handleDynastyClick(dynasty: string) {
   gap: 16px;
   padding: 20px 24px;
   background: #fff;
+  border: none;
   border-radius: 10px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
   transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.dynasty-timeline__item:focus-visible {
+  outline: 2px solid #b8860b;
+  outline-offset: 2px;
+}
+
+.dynasty-timeline__item:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .dynasty-timeline__item--clickable {
   cursor: pointer;
 }
 
-.dynasty-timeline__item--clickable:hover {
+.dynasty-timeline__item--clickable:hover,
+.dynasty-timeline__item--clickable:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #b8860b;
 }
 
 .dynasty-timeline__index {

@@ -2,7 +2,7 @@
 import { computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, Delete, Close, InfoFilled } from '@element-plus/icons-vue'
+import { ArrowLeft, Delete, Close, InfoFilled, Timer } from '@element-plus/icons-vue'
 import { useCompare, MAX_COMPARE_COUNT } from '@/composables/useCompare'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
 
@@ -80,6 +80,9 @@ watch(count, (newCount) => {
         </div>
       </div>
       <div class="coin-compare__header-right">
+        <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
+          朝代年表
+        </el-button>
         <el-button plain type="danger" @click="handleClear">
           <el-icon><Delete /></el-icon>
           <span>清空对比</span>
@@ -200,6 +203,8 @@ watch(count, (newCount) => {
 
 .coin-compare__header-right {
   flex-shrink: 0;
+  display: flex;
+  gap: 12px;
 }
 
 .coin-compare__empty {

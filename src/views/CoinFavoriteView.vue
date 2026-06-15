@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete } from '@element-plus/icons-vue'
+import { Delete, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
@@ -53,6 +53,14 @@ async function handleClearAll() {
           <p class="coin-favorite__desc">共收藏 {{ count }} 枚钱币</p>
         </div>
         <div class="coin-favorite__actions">
+          <el-button
+            type="primary"
+            plain
+            :icon="Timer"
+            @click="router.push('/timeline')"
+          >
+            朝代年表
+          </el-button>
           <el-button
             type="danger"
             plain

@@ -2,7 +2,7 @@
 import { computed, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Star, StarFilled } from '@element-plus/icons-vue'
+import { Star, StarFilled, Timer } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
 import { useCoinDetailQuery, useSimilarCoinsQuery } from '@/composables/useCoinQueries'
@@ -47,6 +47,9 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
     <div class="coin-detail__nav">
       <el-button text @click="router.push('/')">
         ← 返回列表
+      </el-button>
+      <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
+        朝代年表
       </el-button>
     </div>
 
@@ -141,6 +144,8 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 
 .coin-detail__nav {
   margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
 }
 
 .coin-detail__loading {

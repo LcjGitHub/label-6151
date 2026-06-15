@@ -44,12 +44,14 @@ export async function fetchSimilarCoins(coin: Coin, limit = 3): Promise<Coin[]> 
 }
 
 /**
- * 获取所有朝代列表（去重排序）
+ * 获取所有朝代列表（按历史先后顺序排列）
  */
 export async function fetchDynasties(): Promise<string[]> {
   await delay(MOCK_DELAY)
-  const dynasties = [...new Set((coinsData as Coin[]).map((c) => c.dynasty))]
-  return dynasties.sort((a, b) => a.localeCompare(b, 'zh-CN'))
+  const availableDynasties = new Set((coinsData as Coin[]).map((c) => c.dynasty))
+  return (dynastiesData as Omit<DynastyItem, 'coinCount'>[])
+    .map((d) => d.name)
+    .filter((name) => availableDynasties.has(name))
 }
 
 /**
