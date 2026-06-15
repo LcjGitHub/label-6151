@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { DataLine, StarFilled, Timer } from '@element-plus/icons-vue'
+import { DataLine, Search, StarFilled, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
+import FilterBar from '@/components/FilterBar.vue'
 import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
 import { useFavorites } from '@/composables/useFavorites'
+import { useCoinFilter } from '@/composables/useCoinFilter'
 
 const route = useRoute()
 const router = useRouter()
-const selectedDynasty = ref<string>((route.query.dynasty as string) || '')
-const selectedMaterials = ref<string[]>(
-  (() => {
-    const m = route.query.materials
-    if (!m) return []
-    return Array.isArray(m) ? (m as string[]) : [m as string]
-  })(),
-)
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
@@ -26,19 +20,39 @@ const { data: materials } = useMaterialsQuery()
 const { count: compareCount } = useCompare()
 const { count: favoriteCount } = useFavorites()
 
-const filteredCoins = computed(() => {
-  if (!coins.value) return []
-  return coins.value.filter((coin) => {
-    if (selectedDynasty.value && coin.dynasty !== selectedDynasty.value) return false
-    if (selectedMaterials.value.length > 0 && !selectedMaterials.value.includes(coin.material))
-      return false
-    return true
+const initialDynasty = (route.query.dynasty as string) || ''
+const initialMaterials = (() => {
+  const m = route.query.materials
+  if (!m) return []
+  return Array.isArray(m) ? (m as string[]) : [m as string]
+})()
+const initialKeyword = (route.query.keyword as string) || ''
+
+const { selectedDynasty, selectedMaterials, keyword, filteredCoins } =
+  useCoinFilter(coins, {
+    dynasty: initialDynasty,
+    materials: initialMaterials,
+    keyword: initialKeyword,
   })
-})
 
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
+
+const hasActiveFilters = computed(
+  () =>
+    !!selectedDynasty.value ||
+    selectedMaterials.value.length > 0 ||
+    keyword.value.trim().length > 0,
+)
+
+const isFilterResultEmpty = computed(
+  () =>
+    !isLoading.value &&
+    !coinsError.value &&
+    filteredCoins.value.length === 0 &&
+    hasActiveFilters.value,
+)
 
 watch(selectedDynasty, (val) => {
   if (val) {
@@ -54,6 +68,15 @@ watch(selectedMaterials, (val) => {
     router.replace({ query: { ...route.query, materials: val } })
   } else {
     const { materials, ...rest } = route.query
+    router.replace({ query: rest })
+  }
+})
+
+watch(keyword, (val) => {
+  if (val.trim()) {
+    router.replace({ query: { ...route.query, keyword: val.trim() } })
+  } else {
+    const { keyword: _, ...rest } = route.query
     router.replace({ query: rest })
   }
 })
@@ -75,6 +98,16 @@ watch(
     const incoming = JSON.stringify(arr)
     if (current !== incoming) {
       selectedMaterials.value = arr
+    }
+  },
+)
+
+watch(
+  () => route.query.keyword,
+  (val) => {
+    const incoming = (val as string) || ''
+    if (incoming !== keyword.value) {
+      keyword.value = incoming
     }
   },
 )
@@ -111,42 +144,14 @@ watch(
       <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
     </header>
 
-    <div class="coin-list__filter" role="group" aria-label="钱币筛选">
-      <div class="coin-list__filter-row">
-        <span class="coin-list__filter-label" id="dynasty-filter-label">朝代筛选：</span>
-        <el-radio-group
-          v-model="selectedDynasty"
-          size="default"
-          aria-labelledby="dynasty-filter-label"
-        >
-          <el-radio-button label="">全部</el-radio-button>
-          <el-radio-button
-            v-for="dynasty in dynasties"
-            :key="dynasty"
-            :label="dynasty"
-          >
-            {{ dynasty }}
-          </el-radio-button>
-        </el-radio-group>
-      </div>
-      <div v-if="materials && materials.length > 0" class="coin-list__filter-row">
-        <span class="coin-list__filter-label" id="material-filter-label">材质筛选：</span>
-        <el-checkbox-group
-          v-model="selectedMaterials"
-          size="default"
-          aria-labelledby="material-filter-label"
-        >
-          <el-checkbox
-            v-for="material in materials"
-            :key="material"
-            :label="material"
-            :aria-label="`材质：${material}`"
-          >
-            {{ material }}
-          </el-checkbox>
-        </el-checkbox-group>
-      </div>
-    </div>
+    <FilterBar
+      class="coin-list__filter"
+      :dynasties="dynasties"
+      :materials="materials"
+      v-model:selected-dynasty="selectedDynasty"
+      v-model:selected-materials="selectedMaterials"
+      v-model:keyword="keyword"
+    />
 
     <div v-if="isLoading" class="coin-list__loading">
       <el-skeleton :rows="6" animated />
@@ -160,8 +165,21 @@ watch(
     />
 
     <el-empty
+      v-else-if="isFilterResultEmpty"
+      description="没有找到匹配的钱币，请尝试调整筛选条件或搜索关键词"
+    >
+      <template #image>
+        <div class="coin-list__empty-icon">
+          <el-icon :size="48" color="#c0c4cc">
+            <Search />
+          </el-icon>
+        </div>
+      </template>
+    </el-empty>
+
+    <el-empty
       v-else-if="filteredCoins.length === 0"
-      description="暂无符合条件的钱币数据"
+      description="暂无钱币数据"
     />
 
     <div v-else class="coin-list__grid">
@@ -229,27 +247,11 @@ watch(
 }
 
 .coin-list__filter {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   margin-bottom: 28px;
-  padding: 16px 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
-.coin-list__filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-.coin-list__filter-label {
-  font-size: 14px;
-  color: #666;
-  white-space: nowrap;
+.coin-list__empty-icon {
+  margin-bottom: 12px;
 }
 
 .coin-list__grid {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { StarFilled, Timer, DataLine } from '@element-plus/icons-vue'
+import { StarFilled, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import { useSearchQuery } from '@/composables/useCoinQueries'
 
