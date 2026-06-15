@@ -219,6 +219,7 @@ watch(
       subtitle="按朝代浏览中国历代钱币形制"
       show-timeline
       show-statistics
+      show-random
       show-favorites
       show-recent-views
     />

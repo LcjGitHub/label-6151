@@ -171,6 +171,26 @@ export async function fetchCoinsByDynasty(dynasty: string): Promise<Coin[]> {
 }
 
 /**
+ * 随机获取一枚钱币
+ * 若传入 excludeId，则排除该 ID 的钱币（避免连续两次随机到同一枚）
+ * @param excludeId - 需要排除的钱币 ID
+ */
+export async function fetchRandomCoin(excludeId?: string): Promise<Coin | undefined> {
+  await delay(MOCK_DELAY)
+  const coins = coinsData as Coin[]
+  if (coins.length === 0) return undefined
+  let pool = coins
+  if (excludeId) {
+    const filtered = coins.filter((c) => c.id !== excludeId)
+    if (filtered.length > 0) {
+      pool = filtered
+    }
+  }
+  const randomIndex = Math.floor(Math.random() * pool.length)
+  return pool[randomIndex]
+}
+
+/**
  * 获取钱币统计概览数据
  * 聚合计算总钱币数量、朝代数量、材质种类数，
  * 以及各朝代钱币数量分布和各材质占比

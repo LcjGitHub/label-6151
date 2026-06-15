@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { DataLine, StarFilled, Timer, ArrowLeft, Clock } from '@element-plus/icons-vue'
+import { DataLine, StarFilled, Timer, ArrowLeft, Clock, Guide } from '@element-plus/icons-vue'
 import { useFavorites } from '@/composables/useFavorites'
 import { useRecentViews } from '@/composables/useRecentViews'
 
@@ -12,6 +12,7 @@ interface Props {
   showFavorites?: boolean
   showStatistics?: boolean
   showRecentViews?: boolean
+  showRandom?: boolean
   variant?: 'card' | 'plain'
   layout?: 'center' | 'split' | 'left'
   favoriteBadgeCount?: number
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
   showFavorites: false,
   showStatistics: false,
   showRecentViews: false,
+  showRandom: false,
   variant: 'plain',
   layout: 'center',
 })
@@ -58,6 +60,10 @@ function goRecentViews() {
 
 function goStatistics() {
   router.push('/statistics')
+}
+
+function goRandom() {
+  router.push('/random')
 }
 </script>
 
@@ -96,6 +102,15 @@ function goStatistics() {
             @click="goStatistics"
           >
             统计概览
+          </el-button>
+          <el-button
+            v-if="showRandom"
+            type="primary"
+            plain
+            :icon="Guide"
+            @click="goRandom"
+          >
+            随机发现
           </el-button>
           <el-button
             v-if="showFavorites"
@@ -138,6 +153,15 @@ function goStatistics() {
           <el-button v-if="showBack" text @click="goBack"> ← 返回列表 </el-button>
           <el-button v-if="showTimeline" type="primary" plain :icon="Timer" @click="goTimeline">
             朝代年表
+          </el-button>
+          <el-button
+            v-if="showRandom"
+            type="primary"
+            plain
+            :icon="Guide"
+            @click="goRandom"
+          >
+            随机发现
           </el-button>
           <el-button
             v-if="showRecentViews"
@@ -186,6 +210,15 @@ function goStatistics() {
             @click="goStatistics"
           >
             统计概览
+          </el-button>
+          <el-button
+            v-if="showRandom"
+            type="primary"
+            plain
+            :icon="Guide"
+            @click="goRandom"
+          >
+            随机发现
           </el-button>
           <el-button
             v-if="showFavorites"

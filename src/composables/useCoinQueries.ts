@@ -10,6 +10,7 @@ import {
   fetchDynastyByName,
   fetchDynastyTimeline,
   fetchMaterials,
+  fetchRandomCoin,
   fetchSameMaterialCoins,
   fetchSimilarCoins,
   fetchStatistics,
@@ -32,6 +33,7 @@ export const coinKeys = {
   search: (keyword: string) => ['coins', 'search', keyword] as const,
   dynastyDetail: (name: string) => ['dynasties', 'detail', name] as const,
   dynastyCoins: (dynasty: string) => ['coins', 'dynasty', dynasty] as const,
+  random: (excludeId?: string) => ['coins', 'random', excludeId ?? 'none'] as const,
 }
 
 /**
@@ -178,5 +180,16 @@ export function useCoinsByDynastyQuery(dynasty: Ref<string>) {
     queryKey: computed(() => coinKeys.dynastyCoins(dynasty.value)),
     queryFn: () => fetchCoinsByDynasty(dynasty.value),
     enabled: computed(() => !!dynasty.value),
+  })
+}
+
+/**
+ * 随机获取一枚钱币
+ * @param excludeId - 需要排除的钱币 ID（响应式，用于避免连续随机到同一枚）
+ */
+export function useRandomCoinQuery(excludeId?: Ref<string | undefined>) {
+  return useQuery({
+    queryKey: computed(() => coinKeys.random(excludeId?.value)),
+    queryFn: () => fetchRandomCoin(excludeId?.value),
   })
 }

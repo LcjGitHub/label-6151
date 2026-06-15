@@ -50,6 +50,11 @@ const router = createRouter({
       name: 'recent-views',
       component: () => import('@/views/RecentViewsView.vue'),
     },
+    {
+      path: '/random',
+      name: 'coin-random',
+      component: () => import('@/views/CoinRandomView.vue'),
+    },
   ],
 })
 
