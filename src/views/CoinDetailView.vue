@@ -2,9 +2,10 @@
 import { computed, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Star, StarFilled, Timer, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import { Star, StarFilled, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useCoinDetailQuery, useSimilarCoinsQuery, useSameMaterialCoinsQuery, useAdjacentCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 
@@ -68,20 +69,14 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 
 <template>
   <div class="coin-detail">
-    <div class="coin-detail__nav">
-      <el-button text @click="router.push('/')">
-        ← 返回列表
-      </el-button>
+    <PageHeader layout="left" show-back show-timeline>
       <el-button text :icon="ArrowLeft" :disabled="!hasPrev" aria-label="上一枚钱币" @click="goPrev">
         上一枚
       </el-button>
       <el-button text :icon="ArrowRight" :disabled="!hasNext" aria-label="下一枚钱币" @click="goNext">
         下一枚
       </el-button>
-      <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
-        朝代年表
-      </el-button>
-    </div>
+    </PageHeader>
 
     <div v-if="isLoading" class="coin-detail__loading">
       <el-skeleton :rows="8" animated />
@@ -181,12 +176,6 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
   max-width: 960px;
   margin: 0 auto;
   padding: 24px 20px 48px;
-}
-
-.coin-detail__nav {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 12px;
 }
 
 .coin-detail__loading {

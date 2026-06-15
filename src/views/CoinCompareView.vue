@@ -2,9 +2,10 @@
 import { computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, Delete, Close, InfoFilled, Timer } from '@element-plus/icons-vue'
+import { ArrowLeft, Delete, Close, InfoFilled } from '@element-plus/icons-vue'
 import { useCompare, MAX_COMPARE_COUNT } from '@/composables/useCompare'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
+import PageHeader from '@/components/PageHeader.vue'
 
 const router = useRouter()
 const { selectedCoins, removeFromCompare, clearCompare, count } = useCompare()
@@ -66,29 +67,26 @@ watch(count, (newCount) => {
 
 <template>
   <div class="coin-compare">
-    <header class="coin-compare__header">
-      <div class="coin-compare__header-left">
+    <PageHeader
+      title="形制对比"
+      :subtitle="`共 ${displayCoins.length} 枚钱币（最多 ${MAX_COMPARE_COUNT} 枚）`"
+      variant="card"
+      layout="split"
+      show-timeline
+    >
+      <template #left>
         <el-button plain @click="router.push('/')">
           <el-icon><ArrowLeft /></el-icon>
           <span>返回列表</span>
         </el-button>
-        <div>
-          <h1 class="coin-compare__title">形制对比</h1>
-          <p class="coin-compare__subtitle">
-            共 {{ displayCoins.length }} 枚钱币（最多 {{ MAX_COMPARE_COUNT }} 枚）
-          </p>
-        </div>
-      </div>
-      <div class="coin-compare__header-right">
-        <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
-          朝代年表
-        </el-button>
+      </template>
+      <template #right>
         <el-button plain type="danger" @click="handleClear">
           <el-icon><Delete /></el-icon>
           <span>清空对比</span>
         </el-button>
-      </div>
-    </header>
+      </template>
+    </PageHeader>
 
     <el-empty
       v-if="displayCoins.length === 0"
@@ -167,44 +165,6 @@ watch(count, (newCount) => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px 48px;
-}
-
-.coin-compare__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 24px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
-}
-
-.coin-compare__header-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.coin-compare__title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #2c1810;
-  letter-spacing: 2px;
-}
-
-.coin-compare__subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: #888;
-}
-
-.coin-compare__header-right {
-  flex-shrink: 0;
-  display: flex;
-  gap: 12px;
 }
 
 .coin-compare__empty {

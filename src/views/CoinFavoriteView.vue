@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { DataLine, Delete, Timer } from '@element-plus/icons-vue'
+import { Delete } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 
@@ -41,46 +42,27 @@ async function handleClearAll() {
 
 <template>
   <div class="coin-favorite">
-    <header class="coin-favorite__header">
-      <div class="coin-favorite__header-inner">
-        <div class="coin-favorite__back">
-          <el-button text @click="router.push('/')">
-            ← 返回列表
-          </el-button>
-        </div>
-        <div class="coin-favorite__title-area">
-          <h1 class="coin-favorite__title">我的收藏</h1>
-          <p class="coin-favorite__desc">共收藏 {{ count }} 枚钱币</p>
-        </div>
-        <div class="coin-favorite__actions">
-          <el-button
-            type="primary"
-            plain
-            :icon="Timer"
-            @click="router.push('/timeline')"
-          >
-            朝代年表
-          </el-button>
-          <el-button
-            type="primary"
-            plain
-            :icon="DataLine"
-            @click="router.push('/statistics')"
-          >
-            统计概览
-          </el-button>
-          <el-button
-            type="danger"
-            plain
-            :icon="Delete"
-            :disabled="count === 0"
-            @click="handleClearAll"
-          >
-            一键清空
-          </el-button>
-        </div>
-      </div>
-    </header>
+    <PageHeader
+      title="我的收藏"
+      :subtitle="`共收藏 ${count} 枚钱币`"
+      variant="card"
+      layout="split"
+      show-back
+      show-timeline
+      show-statistics
+    >
+      <template #right>
+        <el-button
+          type="danger"
+          plain
+          :icon="Delete"
+          :disabled="count === 0"
+          @click="handleClearAll"
+        >
+          一键清空
+        </el-button>
+      </template>
+    </PageHeader>
 
     <div v-if="isLoading" class="coin-favorite__loading">
       <el-skeleton :rows="6" animated />
@@ -134,47 +116,6 @@ async function handleClearAll() {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px 48px;
-}
-
-.coin-favorite__header {
-  margin-bottom: 24px;
-  padding: 20px 24px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
-}
-
-.coin-favorite__header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.coin-favorite__back {
-  flex-shrink: 0;
-}
-
-.coin-favorite__title-area {
-  flex: 1;
-  text-align: center;
-}
-
-.coin-favorite__title {
-  margin: 0 0 4px;
-  font-size: 22px;
-  color: #2c1810;
-  letter-spacing: 2px;
-}
-
-.coin-favorite__desc {
-  margin: 0;
-  font-size: 13px;
-  color: #888;
-}
-
-.coin-favorite__actions {
-  flex-shrink: 0;
 }
 
 .coin-favorite__loading {

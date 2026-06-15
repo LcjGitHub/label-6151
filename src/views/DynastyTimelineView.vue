@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import { ArrowRight } from '@element-plus/icons-vue'
 import { useDynastyTimelineQuery } from '@/composables/useCoinQueries'
+import PageHeader from '@/components/PageHeader.vue'
 
 const router = useRouter()
 const { data: timeline, isLoading, isError } = useDynastyTimelineQuery()
@@ -23,20 +24,12 @@ function handleDynastyClick(dynasty: string) {
 
 <template>
   <div class="dynasty-timeline">
-    <header class="dynasty-timeline__header">
-      <div class="dynasty-timeline__header-top">
-        <el-button
-          type="primary"
-          plain
-          :icon="ArrowLeft"
-          @click="router.push('/')"
-        >
-          返回列表
-        </el-button>
-      </div>
-      <h1 class="dynasty-timeline__title">朝代年表</h1>
-      <p class="dynasty-timeline__desc">按历史先后顺序浏览中国历代钱币</p>
-    </header>
+    <PageHeader
+      title="朝代年表"
+      subtitle="按历史先后顺序浏览中国历代钱币"
+      layout="center"
+      show-back
+    />
 
     <div v-if="isLoading" class="dynasty-timeline__loading">
       <el-skeleton :rows="8" animated />
@@ -94,30 +87,6 @@ function handleDynastyClick(dynasty: string) {
   max-width: 800px;
   margin: 0 auto;
   padding: 24px 20px 48px;
-}
-
-.dynasty-timeline__header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.dynasty-timeline__header-top {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 16px;
-}
-
-.dynasty-timeline__title {
-  margin: 0 0 8px;
-  font-size: 28px;
-  color: #2c1810;
-  letter-spacing: 2px;
-}
-
-.dynasty-timeline__desc {
-  margin: 0;
-  font-size: 14px;
-  color: #888;
 }
 
 .dynasty-timeline__loading {

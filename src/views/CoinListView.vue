@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { DataLine, Search, StarFilled, Timer } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import FilterBar from '@/components/FilterBar.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
-import { useFavorites } from '@/composables/useFavorites'
 import { useCoinFilter } from '@/composables/useCoinFilter'
 
 const route = useRoute()
@@ -18,7 +18,6 @@ const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
 const { data: materials } = useMaterialsQuery()
 
 const { count: compareCount } = useCompare()
-const { count: favoriteCount } = useFavorites()
 
 const initialDynasty = (route.query.dynasty as string) || ''
 const initialMaterials = (() => {
@@ -141,34 +140,13 @@ watch(
 
 <template>
   <div class="coin-list" :class="{ 'has-compare-bar': compareCount > 0 }">
-    <header class="coin-list__header">
-      <div class="coin-list__header-top">
-        <h1 class="coin-list__title">古钱币形制浏览图录</h1>
-        <div class="coin-list__header-buttons">
-          <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
-            朝代年表
-          </el-button>
-          <el-button type="primary" plain :icon="DataLine" @click="router.push('/statistics')">
-            统计概览
-          </el-button>
-          <el-button
-            type="primary"
-            plain
-            :icon="StarFilled"
-            @click="router.push('/favorites')"
-          >
-            我的收藏
-            <el-badge
-              v-if="favoriteCount > 0"
-              :value="favoriteCount"
-              :max="99"
-              class="coin-list__badge"
-            />
-          </el-button>
-        </div>
-      </div>
-      <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
-    </header>
+    <PageHeader
+      title="古钱币形制浏览图录"
+      subtitle="按朝代浏览中国历代钱币形制"
+      show-timeline
+      show-statistics
+      show-favorites
+    />
 
     <FilterBar
       class="coin-list__filter"
@@ -250,42 +228,6 @@ watch(
 
 .coin-list.has-compare-bar {
   padding-bottom: 120px;
-}
-
-.coin-list__header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.coin-list__header-top {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.coin-list__header-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.coin-list__title {
-  margin: 0;
-  font-size: 28px;
-  color: #2c1810;
-  letter-spacing: 2px;
-}
-
-.coin-list__badge {
-  margin-left: 6px;
-}
-
-.coin-list__desc {
-  margin: 0;
-  font-size: 14px;
-  color: #888;
 }
 
 .coin-list__filter {
