@@ -24,6 +24,11 @@ const router = createRouter({
       name: 'coin-favorites',
       component: () => import('@/views/CoinFavoriteView.vue'),
     },
+    {
+      path: '/timeline',
+      name: 'dynasty-timeline',
+      component: () => import('@/views/DynastyTimelineView.vue'),
+    },
   ],
 })
 

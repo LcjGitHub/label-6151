@@ -1,5 +1,7 @@
 import type { Coin } from '@/types/coin'
+import type { DynastyItem } from '@/types/dynasty'
 import coinsData from '@/mock/coins.json'
+import dynastiesData from '@/mock/dynasties.json'
 
 /** 模拟网络延迟（毫秒） */
 const MOCK_DELAY = 300
@@ -48,4 +50,19 @@ export async function fetchDynasties(): Promise<string[]> {
   await delay(MOCK_DELAY)
   const dynasties = [...new Set((coinsData as Coin[]).map((c) => c.dynasty))]
   return dynasties.sort((a, b) => a.localeCompare(b, 'zh-CN'))
+}
+
+/**
+ * 获取朝代年表（按历史先后顺序排列，含钱币数量统计）
+ */
+export async function fetchDynastyTimeline(): Promise<DynastyItem[]> {
+  await delay(MOCK_DELAY)
+  const coinCounts: Record<string, number> = {}
+  for (const coin of coinsData as Coin[]) {
+    coinCounts[coin.dynasty] = (coinCounts[coin.dynasty] || 0) + 1
+  }
+  return (dynastiesData as Omit<DynastyItem, 'coinCount'>[]).map((d) => ({
+    ...d,
+    coinCount: coinCounts[d.name] || 0,
+  }))
 }

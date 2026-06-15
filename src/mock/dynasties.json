@@ -1,0 +1,57 @@
+[
+  {
+    "name": "秦",
+    "startYear": -221,
+    "endYear": -207
+  },
+  {
+    "name": "汉",
+    "startYear": -202,
+    "endYear": 220
+  },
+  {
+    "name": "三国",
+    "startYear": 220,
+    "endYear": 280
+  },
+  {
+    "name": "晋",
+    "startYear": 265,
+    "endYear": 420
+  },
+  {
+    "name": "南北朝",
+    "startYear": 420,
+    "endYear": 589
+  },
+  {
+    "name": "隋",
+    "startYear": 581,
+    "endYear": 618
+  },
+  {
+    "name": "唐",
+    "startYear": 618,
+    "endYear": 907
+  },
+  {
+    "name": "宋",
+    "startYear": 960,
+    "endYear": 1279
+  },
+  {
+    "name": "元",
+    "startYear": 1271,
+    "endYear": 1368
+  },
+  {
+    "name": "明",
+    "startYear": 1368,
+    "endYear": 1644
+  },
+  {
+    "name": "清",
+    "startYear": 1644,
+    "endYear": 1912
+  }
+]

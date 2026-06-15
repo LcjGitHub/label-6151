@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { StarFilled } from '@element-plus/icons-vue'
+import { computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { StarFilled, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import { useCoinsQuery, useDynastiesQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
 import { useFavorites } from '@/composables/useFavorites'
 
+const route = useRoute()
 const router = useRouter()
-const selectedDynasty = ref<string>('')
+const selectedDynasty = ref<string>((route.query.dynasty as string) || '')
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
@@ -26,6 +27,24 @@ const filteredCoins = computed(() => {
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
+
+watch(selectedDynasty, (val) => {
+  if (val) {
+    router.replace({ query: { ...route.query, dynasty: val } })
+  } else {
+    const { dynasty, ...rest } = route.query
+    router.replace({ query: rest })
+  }
+})
+
+watch(
+  () => route.query.dynasty,
+  (val) => {
+    if (val !== selectedDynasty.value) {
+      selectedDynasty.value = (val as string) || ''
+    }
+  },
+)
 </script>
 
 <template>
@@ -33,20 +52,25 @@ const hasContent = computed(() => !isLoading.value && filteredCoins.value.length
     <header class="coin-list__header">
       <div class="coin-list__header-top">
         <h1 class="coin-list__title">古钱币形制浏览图录</h1>
-        <el-button
-          type="primary"
-          plain
-          :icon="StarFilled"
-          @click="router.push('/favorites')"
-        >
-          我的收藏
-          <el-badge
-            v-if="favoriteCount > 0"
-            :value="favoriteCount"
-            :max="99"
-            class="coin-list__badge"
-          />
-        </el-button>
+        <div class="coin-list__header-buttons">
+          <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
+            朝代年表
+          </el-button>
+          <el-button
+            type="primary"
+            plain
+            :icon="StarFilled"
+            @click="router.push('/favorites')"
+          >
+            我的收藏
+            <el-badge
+              v-if="favoriteCount > 0"
+              :value="favoriteCount"
+              :max="99"
+              class="coin-list__badge"
+            />
+          </el-button>
+        </div>
       </div>
       <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
     </header>
@@ -120,6 +144,12 @@ const hasContent = computed(() => !isLoading.value && filteredCoins.value.length
   justify-content: center;
   gap: 16px;
   margin-bottom: 8px;
+}
+
+.coin-list__header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .coin-list__title {
