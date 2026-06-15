@@ -4,27 +4,39 @@ import { useRoute, useRouter } from 'vue-router'
 import { DataLine, StarFilled, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
-import { useCoinsQuery, useDynastiesQuery } from '@/composables/useCoinQueries'
+import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
 import { useFavorites } from '@/composables/useFavorites'
 
 const route = useRoute()
 const router = useRouter()
 const selectedDynasty = ref<string>((route.query.dynasty as string) || '')
+const selectedMaterials = ref<string[]>(
+  (() => {
+    const m = route.query.materials
+    if (!m) return []
+    return Array.isArray(m) ? (m as string[]) : [m as string]
+  })(),
+)
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
+const { data: materials, isLoading: materialsLoading } = useMaterialsQuery()
 
 const { count: compareCount } = useCompare()
 const { count: favoriteCount } = useFavorites()
 
 const filteredCoins = computed(() => {
   if (!coins.value) return []
-  if (!selectedDynasty.value) return coins.value
-  return coins.value.filter((coin) => coin.dynasty === selectedDynasty.value)
+  return coins.value.filter((coin) => {
+    if (selectedDynasty.value && coin.dynasty !== selectedDynasty.value) return false
+    if (selectedMaterials.value.length > 0 && !selectedMaterials.value.includes(coin.material))
+      return false
+    return true
+  })
 })
 
-const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
+const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value || materialsLoading.value)
 
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
 
@@ -37,11 +49,32 @@ watch(selectedDynasty, (val) => {
   }
 })
 
+watch(selectedMaterials, (val) => {
+  if (val.length > 0) {
+    router.replace({ query: { ...route.query, materials: val } })
+  } else {
+    const { materials, ...rest } = route.query
+    router.replace({ query: rest })
+  }
+})
+
 watch(
   () => route.query.dynasty,
   (val) => {
     if (val !== selectedDynasty.value) {
       selectedDynasty.value = (val as string) || ''
+    }
+  },
+)
+
+watch(
+  () => route.query.materials,
+  (val) => {
+    const arr = val ? (Array.isArray(val) ? (val as string[]) : [val as string]) : []
+    const current = JSON.stringify(selectedMaterials.value)
+    const incoming = JSON.stringify(arr)
+    if (current !== incoming) {
+      selectedMaterials.value = arr
     }
   },
 )
@@ -92,6 +125,19 @@ watch(
       </el-radio-group>
     </div>
 
+    <div v-if="materials && materials.length > 0" class="coin-list__filter coin-list__filter--sub">
+      <span class="coin-list__filter-label">材质筛选：</span>
+      <el-checkbox-group v-model="selectedMaterials" size="default">
+        <el-checkbox
+          v-for="material in materials"
+          :key="material"
+          :label="material"
+        >
+          {{ material }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </div>
+
     <div v-if="isLoading" class="coin-list__loading">
       <el-skeleton :rows="6" animated />
     </div>
@@ -105,7 +151,7 @@ watch(
 
     <el-empty
       v-else-if="filteredCoins.length === 0"
-      description="该朝代暂无钱币数据"
+      description="暂无符合条件的钱币数据"
     />
 
     <div v-else class="coin-list__grid">
@@ -182,6 +228,11 @@ watch(
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.coin-list__filter--sub {
+  margin-top: -20px;
+  margin-bottom: 28px;
 }
 
 .coin-list__filter-label {

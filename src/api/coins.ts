@@ -55,6 +55,12 @@ export async function fetchDynasties(): Promise<string[]> {
     .filter((name) => availableDynasties.has(name))
 }
 
+export async function fetchMaterials(): Promise<string[]> {
+  await delay(MOCK_DELAY)
+  const materialSet = new Set((coinsData as Coin[]).map((c) => c.material))
+  return Array.from(materialSet)
+}
+
 /**
  * 获取朝代年表（按历史先后顺序排列，含钱币数量统计）
  */

@@ -5,6 +5,7 @@ import {
   fetchCoins,
   fetchDynasties,
   fetchDynastyTimeline,
+  fetchMaterials,
   fetchSimilarCoins,
   fetchStatistics,
   searchCoins,
@@ -15,6 +16,7 @@ import type { Coin } from '@/types/coin'
 export const coinKeys = {
   all: ['coins'] as const,
   dynasties: ['dynasties'] as const,
+  materials: ['materials'] as const,
   timeline: ['dynasties', 'timeline'] as const,
   statistics: ['statistics'] as const,
   detail: (id: string) => ['coins', id] as const,
@@ -39,6 +41,13 @@ export function useDynastiesQuery() {
   return useQuery({
     queryKey: coinKeys.dynasties,
     queryFn: fetchDynasties,
+  })
+}
+
+export function useMaterialsQuery() {
+  return useQuery({
+    queryKey: coinKeys.materials,
+    queryFn: fetchMaterials,
   })
 }
 
