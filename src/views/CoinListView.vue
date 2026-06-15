@@ -28,7 +28,7 @@ const initialMaterials = (() => {
 })()
 const initialKeyword = (route.query.keyword as string) || ''
 
-const { selectedDynasty, selectedMaterials, keyword, filteredCoins } =
+const { selectedDynasty, selectedMaterials, keyword, filteredCoins, hasActiveFilters } =
   useCoinFilter(coins, {
     dynasty: initialDynasty,
     materials: initialMaterials,
@@ -38,13 +38,6 @@ const { selectedDynasty, selectedMaterials, keyword, filteredCoins } =
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
-
-const hasActiveFilters = computed(
-  () =>
-    !!selectedDynasty.value ||
-    selectedMaterials.value.length > 0 ||
-    keyword.value.trim().length > 0,
-)
 
 const isFilterResultEmpty = computed(
   () =>
@@ -147,11 +140,27 @@ watch(
     <FilterBar
       class="coin-list__filter"
       :dynasties="dynasties"
-      :materials="materials"
       v-model:selected-dynasty="selectedDynasty"
-      v-model:selected-materials="selectedMaterials"
       v-model:keyword="keyword"
     />
+
+    <div v-if="materials && materials.length > 0" class="coin-list__material-filter">
+      <span class="coin-list__filter-label" id="material-filter-label">材质筛选：</span>
+      <el-checkbox-group
+        v-model="selectedMaterials"
+        size="default"
+        aria-labelledby="material-filter-label"
+      >
+        <el-checkbox
+          v-for="material in materials"
+          :key="material"
+          :label="material"
+          :aria-label="`材质：${material}`"
+        >
+          {{ material }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </div>
 
     <div v-if="isLoading" class="coin-list__loading">
       <el-skeleton :rows="6" animated />
@@ -247,7 +256,25 @@ watch(
 }
 
 .coin-list__filter {
+  margin-bottom: 12px;
+}
+
+.coin-list__material-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 28px;
+  padding: 12px 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.coin-list__filter-label {
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
 }
 
 .coin-list__empty-icon {
