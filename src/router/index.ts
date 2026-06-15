@@ -29,6 +29,11 @@ const router = createRouter({
       name: 'dynasty-timeline',
       component: () => import('@/views/DynastyTimelineView.vue'),
     },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('@/views/SearchResultsView.vue'),
+    },
   ],
 })
 

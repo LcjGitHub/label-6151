@@ -68,3 +68,15 @@ export async function fetchDynastyTimeline(): Promise<DynastyItem[]> {
     coinCount: coinCounts[d.name] || 0,
   }))
 }
+
+export async function searchCoins(keyword: string): Promise<Coin[]> {
+  await delay(MOCK_DELAY)
+  const kw = keyword.trim().toLowerCase()
+  if (!kw) return []
+  return (coinsData as Coin[]).filter(
+    (c) =>
+      c.name.toLowerCase().includes(kw) ||
+      c.obverse.toLowerCase().includes(kw) ||
+      c.reverse.toLowerCase().includes(kw),
+  )
+}

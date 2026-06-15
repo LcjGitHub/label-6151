@@ -6,6 +6,7 @@ import {
   fetchDynasties,
   fetchDynastyTimeline,
   fetchSimilarCoins,
+  searchCoins,
 } from '@/api/coins'
 import type { Coin } from '@/types/coin'
 
@@ -16,6 +17,7 @@ export const coinKeys = {
   timeline: ['dynasties', 'timeline'] as const,
   detail: (id: string) => ['coins', id] as const,
   similar: (id: string) => ['coins', id, 'similar'] as const,
+  search: (keyword: string) => ['coins', 'search', keyword] as const,
 }
 
 /**
@@ -71,5 +73,13 @@ export function useSimilarCoinsQuery(coin: Ref<Coin | undefined>) {
     ),
     queryFn: () => fetchSimilarCoins(coin.value!),
     enabled: computed(() => !!coin.value),
+  })
+}
+
+export function useSearchQuery(keyword: Ref<string>) {
+  return useQuery({
+    queryKey: computed(() => coinKeys.search(keyword.value)),
+    queryFn: () => searchCoins(keyword.value),
+    enabled: computed(() => keyword.value.trim().length > 0),
   })
 }
