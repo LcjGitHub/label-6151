@@ -33,6 +33,26 @@ export async function fetchCoinById(id: string): Promise<Coin | undefined> {
 }
 
 /**
+ * 按编号获取相邻钱币 ID
+ * 根据模拟数据中的默认顺序，返回前一枚和后一枚的 ID
+ * @param id - 当前钱币 ID
+ */
+export interface AdjacentCoinIds {
+  prevId: string | null
+  nextId: string | null
+}
+
+export async function fetchAdjacentCoinIds(id: string): Promise<AdjacentCoinIds> {
+  await delay(MOCK_DELAY)
+  const coins = coinsData as Coin[]
+  const index = coins.findIndex((c) => c.id === id)
+  return {
+    prevId: index > 0 ? coins[index - 1].id : null,
+    nextId: index < coins.length - 1 ? coins[index + 1].id : null,
+  }
+}
+
+/**
  * 获取同朝代相似形制推荐（排除当前钱币，最多 limit 条）
  * @param coin - 当前钱币
  * @param limit - 推荐数量，默认 3

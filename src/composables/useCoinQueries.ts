@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 import {
+  fetchAdjacentCoinIds,
   fetchCoinById,
   fetchCoins,
   fetchDynasties,
@@ -20,6 +21,7 @@ export const coinKeys = {
   timeline: ['dynasties', 'timeline'] as const,
   statistics: ['statistics'] as const,
   detail: (id: string) => ['coins', id] as const,
+  adjacent: (id: string) => ['coins', id, 'adjacent'] as const,
   similar: (id: string) => ['coins', id, 'similar'] as const,
   search: (keyword: string) => ['coins', 'search', keyword] as const,
 }
@@ -72,6 +74,14 @@ export function useCoinDetailQuery(id: Ref<string>) {
   return useQuery({
     queryKey: computed(() => coinKeys.detail(id.value)),
     queryFn: () => fetchCoinById(id.value),
+    enabled: computed(() => !!id.value),
+  })
+}
+
+export function useAdjacentCoinsQuery(id: Ref<string>) {
+  return useQuery({
+    queryKey: computed(() => coinKeys.adjacent(id.value)),
+    queryFn: () => fetchAdjacentCoinIds(id.value),
     enabled: computed(() => !!id.value),
   })
 }

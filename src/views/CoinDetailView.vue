@@ -2,10 +2,10 @@
 import { computed, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Star, StarFilled, Timer } from '@element-plus/icons-vue'
+import { Star, StarFilled, Timer, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
-import { useCoinDetailQuery, useSimilarCoinsQuery } from '@/composables/useCoinQueries'
+import { useCoinDetailQuery, useSimilarCoinsQuery, useAdjacentCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 
 const props = defineProps<{
@@ -18,10 +18,24 @@ const idRef = toRef(props, 'id')
 const { data: coin, isLoading, isError } = useCoinDetailQuery(idRef)
 const coinRef = computed(() => coin.value)
 const { data: similarCoins, isLoading: similarLoading } = useSimilarCoinsQuery(coinRef)
+const { data: adjacentIds } = useAdjacentCoinsQuery(idRef)
 
 const { isFavorite, toggleFavorite } = useFavorites()
 
 const isFavorited = computed(() => (coin.value ? isFavorite(coin.value.id) : false))
+
+const hasPrev = computed(() => adjacentIds.value?.prevId != null)
+const hasNext = computed(() => adjacentIds.value?.nextId != null)
+
+function goPrev() {
+  const prevId = adjacentIds.value?.prevId
+  if (prevId) router.push({ name: 'coin-detail', params: { id: prevId } })
+}
+
+function goNext() {
+  const nextId = adjacentIds.value?.nextId
+  if (nextId) router.push({ name: 'coin-detail', params: { id: nextId } })
+}
 
 function handleToggleFavorite() {
   if (!coin.value) return
@@ -29,16 +43,11 @@ function handleToggleFavorite() {
   ElMessage.success(favorited ? '已添加到收藏' : '已取消收藏')
 }
 
-/**
- * 格式化铸造年份显示
- * @param mintYear - 原始年份字符串
- */
 function formatMintYear(mintYear?: string): string {
   if (!mintYear) return '不详'
   return mintYear
 }
 
-/** 页面加载时间（演示 dayjs 使用） */
 const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 </script>
 
@@ -47,6 +56,12 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
     <div class="coin-detail__nav">
       <el-button text @click="router.push('/')">
         ← 返回列表
+      </el-button>
+      <el-button text :icon="ArrowLeft" :disabled="!hasPrev" @click="goPrev">
+        上一枚
+      </el-button>
+      <el-button text :disabled="!hasNext" @click="goNext">
+        下一枚 <el-icon><ArrowRight /></el-icon>
       </el-button>
       <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
         朝代年表
