@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, toRef, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Star, StarFilled, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import { Star, StarFilled, ArrowLeft, ArrowRight, Notebook, Edit } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -14,6 +14,7 @@ import {
 } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 import { useRecentViews } from '@/composables/useRecentViews'
+import { useNotes } from '@/composables/useNotes'
 
 const props = defineProps<{
   id: string
@@ -31,8 +32,15 @@ const { data: adjacentIds, isLoading: adjacentLoading } = useAdjacentCoinsQuery(
 
 const { isFavorite, toggleFavorite } = useFavorites()
 const { addView } = useRecentViews()
+const { getNote, hasNote, saveNote } = useNotes()
 
 const isFavorited = computed(() => (coin.value ? isFavorite(coin.value.id) : false))
+
+const currentNote = computed(() => (coin.value ? getNote(coin.value.id) : undefined))
+const hasCurrentNote = computed(() => (coin.value ? hasNote(coin.value.id) : false))
+
+const noteDialogVisible = ref(false)
+const noteContent = ref('')
 
 watch(
   () => coin.value,
@@ -47,47 +55,64 @@ watch(
 const hasPrev = computed(() => adjacentLoading.value || adjacentIds.value?.prevId != null)
 const hasNext = computed(() => adjacentLoading.value || adjacentIds.value?.nextId != null)
 
-/**
- * 导航到上一枚钱币
- */
 function goPrev() {
   const prevId = adjacentIds.value?.prevId
   if (prevId) router.push({ name: 'coin-detail', params: { id: prevId } })
 }
 
-/**
- * 导航到下一枚钱币
- */
 function goNext() {
   const nextId = adjacentIds.value?.nextId
   if (nextId) router.push({ name: 'coin-detail', params: { id: nextId } })
 }
 
-/**
- * 切换当前钱币的收藏状态
- */
 function handleToggleFavorite() {
   if (!coin.value) return
   const favorited = toggleFavorite(coin.value)
   ElMessage.success(favorited ? '已添加到收藏' : '已取消收藏')
 }
 
-/**
- * 格式化铸造年份显示
- * @param mintYear - 原始年份字符串
- */
+function openNoteDialog() {
+  noteContent.value = currentNote.value?.content || ''
+  noteDialogVisible.value = true
+}
+
+function handleSaveNote() {
+  if (!coin.value) return
+  const trimmed = noteContent.value.trim()
+  if (!trimmed) {
+    ElMessage.warning('笔记内容不能为空')
+    return
+  }
+  saveNote(coin.value.id, trimmed)
+  ElMessage.success(hasCurrentNote.value ? '笔记已更新' : '笔记已保存')
+  noteDialogVisible.value = false
+}
+
+function goNotesList() {
+  router.push('/notes')
+}
+
 function formatMintYear(mintYear?: string): string {
   if (!mintYear) return '不详'
   return mintYear
 }
 
-/** 页面加载时间（演示 dayjs 使用） */
+function formatTime(timestamp: number): string {
+  return dayjs(timestamp).format('YYYY-MM-DD HH:mm')
+}
+
+function getNoteSummary(content: string, maxLen = 80): string {
+  const trimmed = content.trim()
+  if (trimmed.length <= maxLen) return trimmed
+  return trimmed.slice(0, maxLen) + '…'
+}
+
 const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 </script>
 
 <template>
   <div class="coin-detail">
-    <PageHeader layout="left" show-back show-timeline show-recent-views>
+    <PageHeader layout="left" show-back show-timeline show-recent-views show-notes>
       <template #extra>
         <el-button
           text
@@ -160,6 +185,42 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
             >
               {{ isFavorited ? '已收藏' : '收藏' }}
             </el-button>
+            <el-button
+              type="warning"
+              plain
+              :icon="hasCurrentNote ? Edit : Notebook"
+              @click="openNoteDialog"
+            >
+              {{ hasCurrentNote ? '编辑笔记' : '添加笔记' }}
+            </el-button>
+          </div>
+
+          <div v-if="hasCurrentNote && currentNote" class="coin-detail__note-card">
+            <div class="coin-detail__note-header">
+              <el-icon :size="16" color="#8b6914">
+                <Notebook />
+              </el-icon>
+              <span class="coin-detail__note-title">我的笔记</span>
+              <span class="coin-detail__note-time">
+                更新于 {{ formatTime(currentNote.updatedAt) }}
+              </span>
+              <div class="coin-detail__note-actions">
+                <el-button size="small" :icon="Edit" text @click="openNoteDialog">
+                  编辑
+                </el-button>
+                <el-button size="small" text type="primary" @click="goNotesList">
+                  全部笔记
+                </el-button>
+              </div>
+            </div>
+            <div class="coin-detail__note-content">
+              {{ getNoteSummary(currentNote.content) }}
+            </div>
+            <div v-if="currentNote.content.length > 80" class="coin-detail__note-expand">
+              <el-button text size="small" @click="openNoteDialog">
+                查看完整内容 →
+              </el-button>
+            </div>
           </div>
 
           <el-descriptions :column="1" border class="coin-detail__descriptions">
@@ -198,6 +259,34 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
         heading-id="recommend-same-material"
       />
     </template>
+
+    <el-dialog
+      v-model="noteDialogVisible"
+      :title="hasCurrentNote ? '编辑笔记' : '添加笔记'"
+      width="520px"
+      :close-on-click-modal="false"
+      destroy-on-close
+    >
+      <div class="coin-detail__dialog-coin">
+        <el-tag type="warning" effect="dark" size="small">{{ coin?.dynasty }}</el-tag>
+        <span class="coin-detail__dialog-coin-name">{{ coin?.name }}</span>
+      </div>
+      <el-input
+        v-model="noteContent"
+        type="textarea"
+        :rows="8"
+        placeholder="记录你对这枚钱币的心得、研究、收藏故事……"
+        maxlength="2000"
+        show-word-limit
+        resize="vertical"
+      />
+      <template #footer>
+        <el-button @click="noteDialogVisible = false">取消</el-button>
+        <el-button type="primary" :disabled="!noteContent.trim()" @click="handleSaveNote">
+          保存
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -267,6 +356,70 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 
 .coin-detail__actions {
   margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.coin-detail__note-card {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #faf7f2;
+  border-radius: 10px;
+  border: 1px solid #f0ebe3;
+}
+
+.coin-detail__note-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.coin-detail__note-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c1810;
+}
+
+.coin-detail__note-time {
+  flex: 1;
+  font-size: 12px;
+  color: #999;
+}
+
+.coin-detail__note-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.coin-detail__note-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-all;
+  padding: 4px 0;
+}
+
+.coin-detail__note-expand {
+  margin-top: 6px;
+}
+
+.coin-detail__dialog-coin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: #f5f0e8;
+  border-radius: 8px;
+}
+
+.coin-detail__dialog-coin-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c1810;
 }
 
 .coin-detail__descriptions {

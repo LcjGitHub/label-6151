@@ -222,6 +222,7 @@ watch(
       show-random
       show-favorites
       show-recent-views
+      show-notes
     />
 
     <FilterBar

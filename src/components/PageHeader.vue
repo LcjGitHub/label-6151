@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { DataLine, StarFilled, Timer, ArrowLeft, Clock, Guide } from '@element-plus/icons-vue'
+import { DataLine, StarFilled, Timer, ArrowLeft, Clock, Guide, Notebook } from '@element-plus/icons-vue'
 import { useFavorites } from '@/composables/useFavorites'
 import { useRecentViews } from '@/composables/useRecentViews'
+import { useNotes } from '@/composables/useNotes'
 
 interface Props {
   title?: string
@@ -13,6 +14,7 @@ interface Props {
   showStatistics?: boolean
   showRecentViews?: boolean
   showRandom?: boolean
+  showNotes?: boolean
   variant?: 'card' | 'plain'
   layout?: 'center' | 'split' | 'left'
   favoriteBadgeCount?: number
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   showStatistics: false,
   showRecentViews: false,
   showRandom: false,
+  showNotes: false,
   variant: 'plain',
   layout: 'center',
 })
@@ -33,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter()
 const { count: defaultFavoriteCount } = useFavorites()
 const { count: defaultRecentViewsCount } = useRecentViews()
+const { count: defaultNotesCount } = useNotes()
 
 const favoriteCount = () =>
   props.favoriteBadgeCount !== undefined ? props.favoriteBadgeCount : defaultFavoriteCount.value
@@ -41,6 +45,8 @@ const recentViewsCount = () =>
   props.recentViewsBadgeCount !== undefined
     ? props.recentViewsBadgeCount
     : defaultRecentViewsCount.value
+
+const notesCount = () => defaultNotesCount.value
 
 function goBack() {
   router.push('/')
@@ -64,6 +70,10 @@ function goStatistics() {
 
 function goRandom() {
   router.push('/random')
+}
+
+function goNotes() {
+  router.push('/notes')
 }
 </script>
 
@@ -142,6 +152,21 @@ function goRandom() {
               class="page-header__badge"
             />
           </el-button>
+          <el-button
+            v-if="showNotes"
+            type="primary"
+            plain
+            :icon="Notebook"
+            @click="goNotes"
+          >
+            个人笔记
+            <el-badge
+              v-if="notesCount() > 0"
+              :value="notesCount()"
+              :max="99"
+              class="page-header__badge"
+            />
+          </el-button>
           <slot name="extra-actions" />
         </div>
       </div>
@@ -174,6 +199,21 @@ function goRandom() {
             <el-badge
               v-if="recentViewsCount() > 0"
               :value="recentViewsCount()"
+              :max="99"
+              class="page-header__badge"
+            />
+          </el-button>
+          <el-button
+            v-if="showNotes"
+            type="primary"
+            plain
+            :icon="Notebook"
+            @click="goNotes"
+          >
+            个人笔记
+            <el-badge
+              v-if="notesCount() > 0"
+              :value="notesCount()"
               :max="99"
               class="page-header__badge"
             />
@@ -240,6 +280,21 @@ function goRandom() {
             <el-badge
               v-if="recentViewsCount() > 0"
               :value="recentViewsCount()"
+              :max="99"
+              class="page-header__badge"
+            />
+          </el-button>
+          <el-button
+            v-if="showNotes"
+            type="primary"
+            plain
+            :icon="Notebook"
+            @click="goNotes"
+          >
+            个人笔记
+            <el-badge
+              v-if="notesCount() > 0"
+              :value="notesCount()"
               :max="99"
               class="page-header__badge"
             />
