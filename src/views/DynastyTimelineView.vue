@@ -38,25 +38,35 @@ function handleDynastyClick(dynasty: string) {
     <el-result v-else-if="isError" icon="error" title="加载失败" sub-title="请刷新页面重试" />
 
     <div v-else class="dynasty-timeline__list">
-      <button
+      <div
         v-for="(item, index) in timeline"
         :key="item.name"
-        type="button"
         class="dynasty-timeline__item"
         :class="{ 'dynasty-timeline__item--clickable': item.coinCount > 0 }"
-        :disabled="item.coinCount === 0"
         :aria-label="
           item.coinCount > 0
             ? `查看${item.name}朝钱币，共${item.coinCount}枚，年代${formatYear(item.startYear)}至${formatYear(item.endYear)}`
             : `${item.name}朝，年代${formatYear(item.startYear)}至${formatYear(item.endYear)}，暂无钱币数据`
         "
+        :role="item.coinCount > 0 ? 'button' : undefined"
+        :tabindex="item.coinCount > 0 ? 0 : undefined"
         @click="item.coinCount > 0 && handleDynastyClick(item.name)"
+        @keydown.enter="item.coinCount > 0 && handleDynastyClick(item.name)"
+        @keydown.space.prevent="item.coinCount > 0 && handleDynastyClick(item.name)"
       >
         <div class="dynasty-timeline__index" aria-hidden="true">
           {{ String(index + 1).padStart(2, '0') }}
         </div>
         <div class="dynasty-timeline__info">
-          <div class="dynasty-timeline__name">{{ item.name }}</div>
+          <router-link
+            v-if="item.coinCount > 0"
+            :to="`/dynasty/${item.name}`"
+            class="dynasty-timeline__name dynasty-timeline__name--link"
+            @click.stop
+          >
+            {{ item.name }}
+          </router-link>
+          <div v-else class="dynasty-timeline__name">{{ item.name }}</div>
           <div class="dynasty-timeline__period" aria-hidden="true">
             {{ formatYear(item.startYear) }} — {{ formatYear(item.endYear) }}
           </div>
@@ -68,7 +78,7 @@ function handleDynastyClick(dynasty: string) {
         <el-icon v-if="item.coinCount > 0" class="dynasty-timeline__arrow" aria-hidden="true">
           <ArrowRight />
         </el-icon>
-      </button>
+      </div>
     </div>
 
     <footer v-if="timeline && timeline.length > 0" class="dynasty-timeline__footer">
@@ -153,6 +163,22 @@ function handleDynastyClick(dynasty: string) {
   font-weight: 600;
   color: #2c1810;
   margin-bottom: 4px;
+}
+
+.dynasty-timeline__name--link {
+  display: inline-block;
+  text-decoration: none;
+  color: #8b6914;
+  border-bottom: 1px dashed #8b6914;
+  padding-bottom: 1px;
+  transition: all 0.2s ease;
+}
+
+.dynasty-timeline__name--link:hover,
+.dynasty-timeline__name--link:focus-visible {
+  color: #b8860b;
+  border-bottom-color: #b8860b;
+  outline: none;
 }
 
 .dynasty-timeline__period {

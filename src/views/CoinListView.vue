@@ -6,7 +6,12 @@ import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import FilterBar from '@/components/FilterBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
-import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery, useDiameterRangeQuery } from '@/composables/useCoinQueries'
+import {
+  useCoinsQuery,
+  useDynastiesQuery,
+  useMaterialsQuery,
+  useDiameterRangeQuery,
+} from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
 import { useCoinFilter } from '@/composables/useCoinFilter'
 
@@ -28,12 +33,18 @@ const initialMaterials = (() => {
 })()
 const initialKeyword = (route.query.keyword as string) || ''
 
-const { selectedDynasty, selectedMaterials, keyword, diameterRange, filteredCoins, hasActiveFilters } =
-  useCoinFilter(coins, diameterExtremes, {
-    dynasty: initialDynasty,
-    materials: initialMaterials,
-    keyword: initialKeyword,
-  })
+const {
+  selectedDynasty,
+  selectedMaterials,
+  keyword,
+  diameterRange,
+  filteredCoins,
+  hasActiveFilters,
+} = useCoinFilter(coins, diameterExtremes, {
+  dynasty: initialDynasty,
+  materials: initialMaterials,
+  keyword: initialKeyword,
+})
 
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
@@ -165,7 +176,9 @@ watch(diameterRange, (val) => {
     const { diameterMin: _min, diameterMax: _max, ...rest } = route.query
     router.replace({ query: rest })
   } else {
-    router.replace({ query: { ...route.query, diameterMin: String(min), diameterMax: String(max) } })
+    router.replace({
+      query: { ...route.query, diameterMin: String(min), diameterMax: String(max) },
+    })
   }
 })
 
@@ -180,7 +193,12 @@ watch(
       const max = Number(qMax)
       const [curMin, curMax] = diameterRange.value
       if (min !== curMin || max !== curMax) {
-        if (!isNaN(min) && !isNaN(max) && min >= diameterExtremes.value.min && max <= diameterExtremes.value.max) {
+        if (
+          !isNaN(min) &&
+          !isNaN(max) &&
+          min >= diameterExtremes.value.min &&
+          max <= diameterExtremes.value.max
+        ) {
           diameterRange.value = [min, max]
         }
       }
@@ -241,7 +259,11 @@ watch(
           :max="diameterExtremes.max"
           :step="1"
           aria-labelledby="diameter-filter-label"
-          @update:model-value="(val: number[]) => { if (val.length === 2) diameterRange = [val[0], val[1]] }"
+          @update:model-value="
+            (val: number[]) => {
+              if (val.length === 2) diameterRange = [val[0], val[1]]
+            }
+          "
         />
         <span class="coin-list__diameter-value">{{ diameterRange[1] }}mm</span>
       </div>

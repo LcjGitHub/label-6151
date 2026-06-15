@@ -75,9 +75,7 @@ const mockCoins: Coin[] = [
 
 const mockDiameterExtremes: DiameterRange = { min: 24, max: 30 }
 
-function createDiameterExtremesRef(
-  value: DiameterRange | undefined = mockDiameterExtremes,
-) {
+function createDiameterExtremesRef(value: DiameterRange | undefined = mockDiameterExtremes) {
   return ref<DiameterRange | undefined>(value)
 }
 
@@ -99,7 +97,10 @@ describe('useCoinFilter', () => {
 
   it('should filter by dynasty only', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedDynasty, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedDynasty, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedDynasty.value = '唐朝'
 
@@ -110,7 +111,10 @@ describe('useCoinFilter', () => {
 
   it('should filter by single material only', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedMaterials, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedMaterials, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedMaterials.value = ['金']
 
@@ -131,7 +135,10 @@ describe('useCoinFilter', () => {
 
   it('should filter by keyword matching name (case insensitive)', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, keyword, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, keyword, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     keyword.value = '开元'
 
@@ -181,7 +188,10 @@ describe('useCoinFilter', () => {
 
   it('should combine dynasty and material filters', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedDynasty, selectedMaterials } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedDynasty, selectedMaterials } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedDynasty.value = '唐朝'
     selectedMaterials.value = ['金']
@@ -192,7 +202,10 @@ describe('useCoinFilter', () => {
 
   it('should combine dynasty and keyword filters', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedDynasty, keyword } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedDynasty, keyword } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedDynasty.value = '宋朝'
     keyword.value = '元宝'
@@ -203,7 +216,10 @@ describe('useCoinFilter', () => {
 
   it('should combine material and keyword filters', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedMaterials, keyword } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedMaterials, keyword } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedMaterials.value = ['银']
     keyword.value = '宣和'
@@ -290,7 +306,11 @@ describe('useCoinFilter', () => {
 
   it('should handle empty initial state correctly', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef(), {})
+    const { filteredCoins, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+      {},
+    )
 
     expect(filteredCoins.value).toHaveLength(mockCoins.length)
     expect(hasActiveFilters.value).toBe(false)
@@ -306,7 +326,10 @@ describe('useCoinFilter', () => {
 
   it('hasActiveFilters should be true with only material filter', () => {
     const coins = ref(mockCoins)
-    const { selectedMaterials, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { selectedMaterials, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedMaterials.value = ['铜']
     expect(hasActiveFilters.value).toBe(true)
@@ -330,7 +353,10 @@ describe('useCoinFilter', () => {
 
   it('should filter by diameter range', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, diameterRange, hasActiveFilters } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, diameterRange, hasActiveFilters } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     diameterRange.value = [28, 30]
 
@@ -359,7 +385,10 @@ describe('useCoinFilter', () => {
 
   it('should combine diameter range with other filters', () => {
     const coins = ref(mockCoins)
-    const { filteredCoins, selectedDynasty, diameterRange } = useCoinFilter(coins, createDiameterExtremesRef())
+    const { filteredCoins, selectedDynasty, diameterRange } = useCoinFilter(
+      coins,
+      createDiameterExtremesRef(),
+    )
 
     selectedDynasty.value = '宋朝'
     diameterRange.value = [27, 30]
@@ -380,7 +409,10 @@ describe('useCoinFilter', () => {
 
   it('should not activate diameter filter when extremes are undefined', () => {
     const coins = ref(mockCoins)
-    const { hasActiveFilters, filteredCoins } = useCoinFilter(coins, ref<DiameterRange | undefined>(undefined))
+    const { hasActiveFilters, filteredCoins } = useCoinFilter(
+      coins,
+      ref<DiameterRange | undefined>(undefined),
+    )
 
     expect(hasActiveFilters.value).toBe(false)
     expect(filteredCoins.value).toHaveLength(mockCoins.length)

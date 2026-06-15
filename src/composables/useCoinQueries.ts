@@ -4,8 +4,10 @@ import {
   fetchAdjacentCoinIds,
   fetchCoinById,
   fetchCoins,
+  fetchCoinsByDynasty,
   fetchDiameterRange,
   fetchDynasties,
+  fetchDynastyByName,
   fetchDynastyTimeline,
   fetchMaterials,
   fetchSameMaterialCoins,
@@ -28,6 +30,8 @@ export const coinKeys = {
   similar: (id: string) => ['coins', id, 'similar'] as const,
   sameMaterial: (id: string) => ['coins', id, 'sameMaterial'] as const,
   search: (keyword: string) => ['coins', 'search', keyword] as const,
+  dynastyDetail: (name: string) => ['dynasties', 'detail', name] as const,
+  dynastyCoins: (dynasty: string) => ['coins', 'dynasty', dynasty] as const,
 }
 
 /**
@@ -150,5 +154,29 @@ export function useDiameterRangeQuery() {
   return useQuery({
     queryKey: coinKeys.diameterRange,
     queryFn: fetchDiameterRange,
+  })
+}
+
+/**
+ * 根据朝代名称获取朝代详情
+ * @param name - 朝代名称（响应式）
+ */
+export function useDynastyByNameQuery(name: Ref<string>) {
+  return useQuery({
+    queryKey: computed(() => coinKeys.dynastyDetail(name.value)),
+    queryFn: () => fetchDynastyByName(name.value),
+    enabled: computed(() => !!name.value),
+  })
+}
+
+/**
+ * 按朝代获取钱币列表
+ * @param dynasty - 朝代名称（响应式）
+ */
+export function useCoinsByDynastyQuery(dynasty: Ref<string>) {
+  return useQuery({
+    queryKey: computed(() => coinKeys.dynastyCoins(dynasty.value)),
+    queryFn: () => fetchCoinsByDynasty(dynasty.value),
+    enabled: computed(() => !!dynasty.value),
   })
 }

@@ -22,9 +22,7 @@ export function useCoinFilter(
   const selectedDynasty = ref<string>(initialState.dynasty || '')
   const selectedMaterials = ref<string[]>(initialState.materials || [])
   const keyword = ref<string>(initialState.keyword || '')
-  const diameterRange = ref<[number, number]>(
-    initialState.diameterRange || [0, 0],
-  )
+  const diameterRange = ref<[number, number]>(initialState.diameterRange || [0, 0])
 
   const isDiameterInitialized = ref(false)
 

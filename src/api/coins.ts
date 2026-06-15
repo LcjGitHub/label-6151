@@ -144,6 +144,33 @@ export async function searchCoins(keyword: string): Promise<Coin[]> {
 }
 
 /**
+ * 根据朝代名称获取朝代详情
+ * @param name - 朝代名称
+ */
+export async function fetchDynastyByName(name: string): Promise<DynastyItem | undefined> {
+  await delay(MOCK_DELAY)
+  const coinCounts: Record<string, number> = {}
+  for (const coin of coinsData as Coin[]) {
+    coinCounts[coin.dynasty] = (coinCounts[coin.dynasty] || 0) + 1
+  }
+  const dynasty = (dynastiesData as Omit<DynastyItem, 'coinCount'>[]).find((d) => d.name === name)
+  if (!dynasty) return undefined
+  return {
+    ...dynasty,
+    coinCount: coinCounts[dynasty.name] || 0,
+  }
+}
+
+/**
+ * 按朝代获取钱币列表
+ * @param dynasty - 朝代名称
+ */
+export async function fetchCoinsByDynasty(dynasty: string): Promise<Coin[]> {
+  await delay(MOCK_DELAY)
+  return (coinsData as Coin[]).filter((c) => c.dynasty === dynasty)
+}
+
+/**
  * 获取钱币统计概览数据
  * 聚合计算总钱币数量、朝代数量、材质种类数，
  * 以及各朝代钱币数量分布和各材质占比
