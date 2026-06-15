@@ -1,30 +1,42 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import CoinCard from '@/components/CoinCard.vue'
 import type { Coin } from '@/types/coin'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   coins: Coin[]
   loading?: boolean
   title?: string
   subtitle?: string
   emptyDescription?: string
+  headingId?: string
 }>(), {
   title: '相似形制推荐',
   subtitle: '同朝代形制参考',
   emptyDescription: '暂无相似形制',
+  headingId: '',
 })
+
+const resolvedHeadingId = computed(() => {
+  if (props.headingId) return props.headingId
+  return `heading-${props.title.replace(/\s+/g, '-')}`
+})
+
+const shouldRender = computed(() => props.loading || props.coins.length > 0)
 </script>
 
 <template>
-  <section class="similar-coins">
-    <h2 class="similar-coins__title">{{ title }}</h2>
+  <section
+    v-if="shouldRender"
+    class="similar-coins"
+    :aria-labelledby="resolvedHeadingId"
+  >
+    <h2 :id="resolvedHeadingId" class="similar-coins__title">{{ title }}</h2>
     <p class="similar-coins__subtitle">{{ subtitle }}</p>
 
     <div v-if="loading" class="similar-coins__loading">
       <el-skeleton :rows="3" animated />
     </div>
-
-    <el-empty v-else-if="coins.length === 0" :description="emptyDescription" />
 
     <div v-else class="similar-coins__grid">
       <CoinCard v-for="coin in coins" :key="coin.id" :coin="coin" />

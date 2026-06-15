@@ -41,7 +41,7 @@ function handleFavoriteClick(e: Event) {
       v-if="showFavorite"
       class="coin-card__favorite"
       role="button"
-      :aria-label="favorited ? '取消收藏' : '添加收藏'"
+      :aria-label="favorited ? `取消收藏${coin.name}` : `添加收藏${coin.name}`"
       :aria-pressed="favorited"
       @click="handleFavoriteClick($event)"
     >

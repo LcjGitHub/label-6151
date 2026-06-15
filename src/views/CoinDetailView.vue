@@ -162,7 +162,7 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
         :loading="similarLoading"
         title="同朝代推荐"
         subtitle="同朝代形制参考"
-        empty-description="暂无同朝代钱币"
+        heading-id="recommend-same-dynasty"
       />
 
       <SimilarCoins
@@ -170,7 +170,7 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
         :loading="sameMaterialLoading"
         title="同材质推荐"
         subtitle="相同材质钱币参考"
-        empty-description="暂无同材质钱币"
+        heading-id="recommend-same-material"
       />
     </template>
   </div>
