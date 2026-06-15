@@ -52,11 +52,15 @@ function handleCheckboxClick(e: Event, coin: Coin) {
     <div
       v-if="compareMode"
       class="coin-card__compare"
+      role="button"
+      :aria-label="`将${coin.name}${isSelected(coin.id) ? '移出' : '加入'}对比`"
+      :aria-pressed="isSelected(coin.id)"
       @click="handleCheckboxClick($event, coin)"
     >
       <el-checkbox
         :model-value="isSelected(coin.id)"
         :disabled="!isSelected(coin.id) && isFull"
+        :aria-label="`${coin.name}加入对比勾选框`"
       />
       <span class="coin-card__compare-label">
         {{ isSelected(coin.id) ? '已加入' : '加入对比' }}

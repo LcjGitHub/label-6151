@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Close } from '@element-plus/icons-vue'
 import { useCompare, MAX_COMPARE_COUNT } from '@/composables/useCompare'
 
 const router = useRouter()
@@ -20,7 +21,7 @@ function handleGoCompare() {
 </script>
 
 <template>
-  <div class="compare-bar">
+  <div v-if="count > 0" class="compare-bar">
     <div class="compare-bar__content">
       <div class="compare-bar__left">
         <div class="compare-bar__info">
@@ -31,31 +32,27 @@ function handleGoCompare() {
         </div>
 
         <div class="compare-bar__coins">
-          <template v-if="selectedCoins.length > 0">
-            <div
-              v-for="coin in selectedCoins"
-              :key="coin.id"
-              class="compare-bar__item"
+          <div
+            v-for="coin in selectedCoins"
+            :key="coin.id"
+            class="compare-bar__item"
+          >
+            <el-image
+              :src="coin.imageUrl"
+              :alt="coin.name"
+              fit="cover"
+              class="compare-bar__thumb"
+            />
+            <span class="compare-bar__name">{{ coin.name }}</span>
+            <button
+              type="button"
+              class="compare-bar__remove"
+              @click.stop="removeFromCompare(coin.id)"
+              :aria-label="`从对比中移除${coin.name}`"
+              title="移除"
             >
-              <el-image
-                :src="coin.imageUrl"
-                :alt="coin.name"
-                fit="cover"
-                class="compare-bar__thumb"
-              />
-              <span class="compare-bar__name">{{ coin.name }}</span>
-              <button
-                type="button"
-                class="compare-bar__remove"
-                @click.stop="removeFromCompare(coin.id)"
-                title="移除"
-              >
-                <el-icon><Close /></el-icon>
-              </button>
-            </div>
-          </template>
-          <div v-else class="compare-bar__placeholder">
-            请从上方列表勾选钱币加入对比
+              <el-icon><Close /></el-icon>
+            </button>
           </div>
         </div>
       </div>
@@ -135,11 +132,6 @@ function handleGoCompare() {
   flex: 1;
   min-width: 0;
   overflow-x: auto;
-}
-
-.compare-bar__placeholder {
-  font-size: 13px;
-  color: #aaa;
 }
 
 .compare-bar__item {

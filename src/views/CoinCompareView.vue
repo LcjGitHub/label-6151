@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { computed, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { ArrowLeft, Delete, Close, InfoFilled } from '@element-plus/icons-vue'
 import { useCompare, MAX_COMPARE_COUNT } from '@/composables/useCompare'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
 
 const router = useRouter()
-const route = useRoute()
-const { selectedCoins, removeFromCompare, clearCompare } = useCompare()
+const { selectedCoins, removeFromCompare, clearCompare, count } = useCompare()
 
 useCoinsQuery()
 
@@ -46,6 +46,22 @@ function formatFieldValue(key: string, coin: any) {
   }
   return coin[key]
 }
+
+onMounted(() => {
+  if (count.value < 2) {
+    router.replace('/')
+  }
+})
+
+watch(count, (newCount) => {
+  if (newCount < 2) {
+    setTimeout(() => {
+      if (count.value < 2) {
+        router.replace('/')
+      }
+    }, 1500)
+  }
+})
 </script>
 
 <template>
@@ -81,19 +97,20 @@ function formatFieldValue(key: string, coin: any) {
 
     <div v-else class="coin-compare__content">
       <div class="coin-compare__table-wrapper">
-        <table class="coin-compare__table">
+        <table class="coin-compare__table" aria-label="古钱币形制对比表">
           <thead>
             <tr>
-              <th class="coin-compare__th coin-compare__th--field">对比项</th>
+              <th class="coin-compare__th coin-compare__th--field" scope="col">对比项</th>
               <th
                 v-for="coin in displayCoins"
                 :key="coin.id"
                 class="coin-compare__th"
+                scope="col"
               >
                 <div class="coin-compare__col-header">
                   <el-image
                     :src="coin.imageUrl"
-                    :alt="coin.name"
+                    :alt="`${coin.name} 图片`"
                     fit="cover"
                     class="coin-compare__image"
                   />
@@ -102,7 +119,7 @@ function formatFieldValue(key: string, coin: any) {
                     type="button"
                     class="coin-compare__col-remove"
                     @click="handleRemove(coin.id, coin.name)"
-                    title="移除该项"
+                    :aria-label="`从对比中移除${coin.name}`"
                   >
                     <el-icon><Close /></el-icon>
                     <span>移除</span>
@@ -117,9 +134,9 @@ function formatFieldValue(key: string, coin: any) {
               :key="field.key"
               class="coin-compare__row"
             >
-              <td class="coin-compare__td coin-compare__td--field">
+              <th class="coin-compare__td coin-compare__td--field" scope="row">
                 {{ field.label }}
-              </td>
+              </th>
               <td
                 v-for="coin in displayCoins"
                 :key="`${coin.id}-${field.key}`"
@@ -134,7 +151,7 @@ function formatFieldValue(key: string, coin: any) {
         </table>
       </div>
 
-      <div class="coin-compare__tips">
+      <div class="coin-compare__tips" role="note">
         <el-icon><InfoFilled /></el-icon>
         <span>提示：点击「移除」可移出单项对比，不足两枚时将自动返回列表页</span>
       </div>
