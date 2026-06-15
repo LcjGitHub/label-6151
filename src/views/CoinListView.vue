@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { StarFilled } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import { useCoinsQuery, useDynastiesQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
+import { useFavorites } from '@/composables/useFavorites'
 
+const router = useRouter()
 const selectedDynasty = ref<string>('')
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
 
 const { count: compareCount } = useCompare()
+const { count: favoriteCount } = useFavorites()
 
 const filteredCoins = computed(() => {
   if (!coins.value) return []
@@ -26,7 +31,23 @@ const hasContent = computed(() => !isLoading.value && filteredCoins.value.length
 <template>
   <div class="coin-list" :class="{ 'has-compare-bar': compareCount > 0 }">
     <header class="coin-list__header">
-      <h1 class="coin-list__title">古钱币形制浏览图录</h1>
+      <div class="coin-list__header-top">
+        <h1 class="coin-list__title">古钱币形制浏览图录</h1>
+        <el-button
+          type="primary"
+          plain
+          :icon="StarFilled"
+          @click="router.push('/favorites')"
+        >
+          我的收藏
+          <el-badge
+            v-if="favoriteCount > 0"
+            :value="favoriteCount"
+            :max="99"
+            class="coin-list__badge"
+          />
+        </el-button>
+      </div>
       <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
     </header>
 
@@ -93,11 +114,23 @@ const hasContent = computed(() => !isLoading.value && filteredCoins.value.length
   margin-bottom: 32px;
 }
 
+.coin-list__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .coin-list__title {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 28px;
   color: #2c1810;
   letter-spacing: 2px;
+}
+
+.coin-list__badge {
+  margin-left: 6px;
 }
 
 .coin-list__desc {

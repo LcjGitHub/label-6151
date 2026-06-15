@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { Star, StarFilled } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
 import { useCoinDetailQuery, useSimilarCoinsQuery } from '@/composables/useCoinQueries'
+import { useFavorites } from '@/composables/useFavorites'
 
 const props = defineProps<{
   id: string
@@ -15,6 +18,16 @@ const idRef = toRef(props, 'id')
 const { data: coin, isLoading, isError } = useCoinDetailQuery(idRef)
 const coinRef = computed(() => coin.value)
 const { data: similarCoins, isLoading: similarLoading } = useSimilarCoinsQuery(coinRef)
+
+const { isFavorite, toggleFavorite } = useFavorites()
+
+const isFavorited = computed(() => (coin.value ? isFavorite(coin.value.id) : false))
+
+function handleToggleFavorite() {
+  if (!coin.value) return
+  const favorited = toggleFavorite(coin.value)
+  ElMessage.success(favorited ? '已添加到收藏' : '已取消收藏')
+}
 
 /**
  * 格式化铸造年份显示
@@ -78,6 +91,16 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
           </el-tag>
           <h1 class="coin-detail__title">{{ coin.name }}</h1>
           <p class="coin-detail__desc">{{ coin.description }}</p>
+
+          <div class="coin-detail__actions">
+            <el-button
+              type="primary"
+              :icon="isFavorited ? StarFilled : Star"
+              @click="handleToggleFavorite"
+            >
+              {{ isFavorited ? '已收藏' : '收藏' }}
+            </el-button>
+          </div>
 
           <el-descriptions :column="1" border class="coin-detail__descriptions">
             <el-descriptions-item label="面文">
@@ -171,10 +194,14 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 }
 
 .coin-detail__desc {
-  margin: 0 0 24px;
+  margin: 0 0 16px;
   font-size: 14px;
   line-height: 1.7;
   color: #666;
+}
+
+.coin-detail__actions {
+  margin-bottom: 20px;
 }
 
 .coin-detail__descriptions {

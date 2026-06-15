@@ -19,6 +19,11 @@ const router = createRouter({
       name: 'coin-compare',
       component: () => import('@/views/CoinCompareView.vue'),
     },
+    {
+      path: '/favorites',
+      name: 'coin-favorites',
+      component: () => import('@/views/CoinFavoriteView.vue'),
+    },
   ],
 })
 

@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { Star, StarFilled } from '@element-plus/icons-vue'
 import type { Coin } from '@/types/coin'
 import { useCompare } from '@/composables/useCompare'
+import { useFavorites } from '@/composables/useFavorites'
 
-defineProps<{
+const props = defineProps<{
   coin: Coin
   compareMode?: boolean
+  showFavorite?: boolean
 }>()
 
 const { isSelected, isFull, toggleCompare } = useCompare()
+const { isFavorite, toggleFavorite } = useFavorites()
+
+const favorited = computed(() => isFavorite(props.coin.id))
 
 function handleCheckboxClick(e: Event, coin: Coin) {
   e.preventDefault()
@@ -18,10 +25,30 @@ function handleCheckboxClick(e: Event, coin: Coin) {
   }
   toggleCompare(coin)
 }
+
+function handleFavoriteClick(e: Event) {
+  e.preventDefault()
+  e.stopPropagation()
+  toggleFavorite(props.coin)
+}
 </script>
 
 <template>
   <div class="coin-card-wrapper">
+    <div
+      v-if="showFavorite !== false"
+      class="coin-card__favorite"
+      role="button"
+      :aria-label="favorited ? '取消收藏' : '添加收藏'"
+      :aria-pressed="favorited"
+      @click="handleFavoriteClick($event)"
+    >
+      <el-icon :size="20" :class="{ 'is-favorited': favorited }">
+        <StarFilled v-if="favorited" />
+        <Star v-else />
+      </el-icon>
+    </div>
+
     <router-link :to="`/coin/${coin.id}`" class="coin-card">
       <div class="coin-card__image">
         <el-image
@@ -72,6 +99,35 @@ function handleCheckboxClick(e: Event, coin: Coin) {
 <style scoped>
 .coin-card-wrapper {
   position: relative;
+}
+
+.coin-card__favorite {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  color: #ccc;
+}
+
+.coin-card__favorite:hover {
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+}
+
+.coin-card__favorite :deep(.is-favorited) {
+  color: #f5a623;
 }
 
 .coin-card {
