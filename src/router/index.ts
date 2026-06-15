@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('@/views/CoinDetailView.vue'),
       props: true,
     },
+    {
+      path: '/compare',
+      name: 'coin-compare',
+      component: () => import('@/views/CoinCompareView.vue'),
+    },
   ],
 })
 

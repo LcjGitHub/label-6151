@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import CoinCard from '@/components/CoinCard.vue'
+import CompareBar from '@/components/CompareBar.vue'
 import { useCoinsQuery, useDynastiesQuery } from '@/composables/useCoinQueries'
+import { useCompare } from '@/composables/useCompare'
 
 const selectedDynasty = ref<string>('')
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
 
-/** 按朝代筛选后的钱币列表 */
+const { count: compareCount } = useCompare()
+
 const filteredCoins = computed(() => {
   if (!coins.value) return []
   if (!selectedDynasty.value) return coins.value
@@ -16,10 +19,12 @@ const filteredCoins = computed(() => {
 })
 
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
+
+const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
 </script>
 
 <template>
-  <div class="coin-list">
+  <div class="coin-list" :class="{ 'has-compare-bar': compareCount > 0 }">
     <header class="coin-list__header">
       <h1 class="coin-list__title">古钱币形制浏览图录</h1>
       <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
@@ -56,12 +61,19 @@ const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
     />
 
     <div v-else class="coin-list__grid">
-      <CoinCard v-for="coin in filteredCoins" :key="coin.id" :coin="coin" />
+      <CoinCard
+        v-for="coin in filteredCoins"
+        :key="coin.id"
+        :coin="coin"
+        compare-mode
+      />
     </div>
 
-    <footer v-if="!isLoading && filteredCoins.length > 0" class="coin-list__footer">
+    <footer v-if="hasContent" class="coin-list__footer">
       共 {{ filteredCoins.length }} 枚钱币
     </footer>
+
+    <CompareBar />
   </div>
 </template>
 
@@ -70,6 +82,10 @@ const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px 48px;
+}
+
+.coin-list.has-compare-bar {
+  padding-bottom: 120px;
 }
 
 .coin-list__header {

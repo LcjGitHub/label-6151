@@ -1,41 +1,75 @@
 <script setup lang="ts">
 import type { Coin } from '@/types/coin'
+import { useCompare } from '@/composables/useCompare'
 
 defineProps<{
   coin: Coin
+  compareMode?: boolean
 }>()
+
+const { isSelected, isFull, toggleCompare } = useCompare()
+
+function handleCheckboxClick(e: Event, coin: Coin) {
+  e.preventDefault()
+  e.stopPropagation()
+  const selected = isSelected(coin.id)
+  if (!selected && isFull.value) {
+    return
+  }
+  toggleCompare(coin)
+}
 </script>
 
 <template>
-  <router-link :to="`/coin/${coin.id}`" class="coin-card">
-    <div class="coin-card__image">
-      <el-image
-        :src="coin.imageUrl"
-        :alt="coin.name"
-        fit="cover"
-        lazy
-        class="coin-card__img"
-      >
-        <template #placeholder>
-          <div class="coin-card__placeholder">加载中…</div>
-        </template>
-        <template #error>
-          <div class="coin-card__placeholder">暂无图片</div>
-        </template>
-      </el-image>
+  <div class="coin-card-wrapper">
+    <router-link :to="`/coin/${coin.id}`" class="coin-card">
+      <div class="coin-card__image">
+        <el-image
+          :src="coin.imageUrl"
+          :alt="coin.name"
+          fit="cover"
+          lazy
+          class="coin-card__img"
+        >
+          <template #placeholder>
+            <div class="coin-card__placeholder">加载中…</div>
+          </template>
+          <template #error>
+            <div class="coin-card__placeholder">暂无图片</div>
+          </template>
+        </el-image>
+      </div>
+      <div class="coin-card__body">
+        <h3 class="coin-card__title">{{ coin.name }}</h3>
+        <p class="coin-card__meta">
+          <span class="coin-card__dynasty">{{ coin.dynasty }}</span>
+          <span>{{ coin.obverse }}</span>
+        </p>
+        <p class="coin-card__info">{{ coin.diameter }}mm · {{ coin.material }}</p>
+      </div>
+    </router-link>
+
+    <div
+      v-if="compareMode"
+      class="coin-card__compare"
+      @click="handleCheckboxClick($event, coin)"
+    >
+      <el-checkbox
+        :model-value="isSelected(coin.id)"
+        :disabled="!isSelected(coin.id) && isFull"
+      />
+      <span class="coin-card__compare-label">
+        {{ isSelected(coin.id) ? '已加入' : '加入对比' }}
+      </span>
     </div>
-    <div class="coin-card__body">
-      <h3 class="coin-card__title">{{ coin.name }}</h3>
-      <p class="coin-card__meta">
-        <span class="coin-card__dynasty">{{ coin.dynasty }}</span>
-        <span>{{ coin.obverse }}</span>
-      </p>
-      <p class="coin-card__info">{{ coin.diameter }}mm · {{ coin.material }}</p>
-    </div>
-  </router-link>
+  </div>
 </template>
 
 <style scoped>
+.coin-card-wrapper {
+  position: relative;
+}
+
 .coin-card {
   display: block;
   border-radius: 8px;
@@ -108,5 +142,32 @@ defineProps<{
   margin: 0;
   font-size: 12px;
   color: #999;
+}
+
+.coin-card__compare {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.coin-card__compare:hover {
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.coin-card__compare-label {
+  font-size: 12px;
+  color: #2c1810;
+  white-space: nowrap;
 }
 </style>
