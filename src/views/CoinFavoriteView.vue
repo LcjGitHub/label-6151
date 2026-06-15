@@ -68,28 +68,14 @@ async function handleClearAll() {
       <el-skeleton :rows="6" animated />
     </div>
 
-    <el-result
-      v-else-if="isError"
-      icon="error"
-      title="加载失败"
-      sub-title="请刷新页面重试"
-    />
+    <el-result v-else-if="isError" icon="error" title="加载失败" sub-title="请刷新页面重试" />
 
-    <el-empty
-      v-else-if="favoriteCoins.length === 0"
-      description="暂无收藏的钱币"
-    >
-      <el-button type="primary" @click="router.push('/')">
-        去浏览
-      </el-button>
+    <el-empty v-else-if="favoriteCoins.length === 0" description="暂无收藏的钱币">
+      <el-button type="primary" @click="router.push('/')"> 去浏览 </el-button>
     </el-empty>
 
     <div v-else class="coin-favorite__grid">
-      <div
-        v-for="coin in favoriteCoins"
-        :key="coin.id"
-        class="coin-favorite__item"
-      >
+      <div v-for="coin in favoriteCoins" :key="coin.id" class="coin-favorite__item">
         <CoinCard :coin="coin" :show-favorite="false" />
         <div class="coin-favorite__item-actions">
           <el-button

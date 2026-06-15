@@ -32,11 +32,7 @@ function handleGoCompare() {
         </div>
 
         <div class="compare-bar__coins">
-          <div
-            v-for="coin in selectedCoins"
-            :key="coin.id"
-            class="compare-bar__item"
-          >
+          <div v-for="coin in selectedCoins" :key="coin.id" class="compare-bar__item">
             <el-image
               :src="coin.imageUrl"
               :alt="coin.name"
@@ -47,9 +43,9 @@ function handleGoCompare() {
             <button
               type="button"
               class="compare-bar__remove"
-              @click.stop="removeFromCompare(coin.id)"
               :aria-label="`从对比中移除${coin.name}`"
               title="移除"
+              @click.stop="removeFromCompare(coin.id)"
             >
               <el-icon><Close /></el-icon>
             </button>
@@ -61,11 +57,7 @@ function handleGoCompare() {
         <el-button plain type="danger" :disabled="count === 0" @click="handleClear">
           清空
         </el-button>
-        <el-button
-          type="primary"
-          :disabled="count < 2"
-          @click="handleGoCompare"
-        >
+        <el-button type="primary" :disabled="count < 2" @click="handleGoCompare">
           去对比
         </el-button>
       </div>

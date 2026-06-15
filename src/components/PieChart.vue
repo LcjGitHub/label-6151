@@ -74,7 +74,11 @@ const chartAriaLabel = computed(() => {
     <figcaption v-if="title" class="pie-chart__title">{{ title }}</figcaption>
     <div class="pie-chart__content">
       <div class="pie-chart__chart-wrap">
-        <svg :viewBox="`0 0 ${viewBoxSize} ${viewBoxSize}`" class="pie-chart__svg" focusable="false">
+        <svg
+          :viewBox="`0 0 ${viewBoxSize} ${viewBoxSize}`"
+          class="pie-chart__svg"
+          focusable="false"
+        >
           <g>
             <path
               v-for="slice in slices"
@@ -89,12 +93,12 @@ const chartAriaLabel = computed(() => {
         </svg>
       </div>
       <ul class="pie-chart__legend" aria-label="饼图图例">
-        <li
-          v-for="slice in slices"
-          :key="slice.label"
-          class="pie-chart__legend-item"
-        >
-          <span class="pie-chart__legend-dot" :style="{ backgroundColor: slice.color }" aria-hidden="true" />
+        <li v-for="slice in slices" :key="slice.label" class="pie-chart__legend-item">
+          <span
+            class="pie-chart__legend-dot"
+            :style="{ backgroundColor: slice.color }"
+            aria-hidden="true"
+          />
           <span class="pie-chart__legend-label">{{ slice.label }}</span>
           <span class="pie-chart__legend-value">{{ slice.ratio }}%</span>
         </li>

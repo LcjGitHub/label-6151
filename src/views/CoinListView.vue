@@ -46,7 +46,7 @@ function validateDynastyParam(val: unknown): string {
 }
 
 function clearInvalidDynastyParam() {
-  const { dynasty, ...rest } = route.query
+  const { dynasty: _dynasty, ...rest } = route.query
   router.replace({ query: rest })
 }
 
@@ -79,7 +79,7 @@ watch(selectedDynasty, (val) => {
   if (val) {
     router.replace({ query: { ...route.query, dynasty: val } })
   } else {
-    const { dynasty, ...rest } = route.query
+    const { dynasty: _dynasty, ...rest } = route.query
     router.replace({ query: rest })
   }
 })
@@ -88,7 +88,7 @@ watch(selectedMaterials, (val) => {
   if (val.length > 0) {
     router.replace({ query: { ...route.query, materials: val } })
   } else {
-    const { materials, ...rest } = route.query
+    const { materials: _materials, ...rest } = route.query
     router.replace({ query: rest })
   }
 })
@@ -97,7 +97,7 @@ watch(keyword, (val) => {
   if (val.trim()) {
     router.replace({ query: { ...route.query, keyword: val.trim() } })
   } else {
-    const { keyword: _, ...rest } = route.query
+    const { keyword: _keyword, ...rest } = route.query
     router.replace({ query: rest })
   }
 })
@@ -149,14 +149,14 @@ watch(
     />
 
     <FilterBar
-      class="coin-list__filter"
-      :dynasties="dynasties"
       v-model:selected-dynasty="selectedDynasty"
       v-model:keyword="keyword"
+      class="coin-list__filter"
+      :dynasties="dynasties"
     />
 
     <div v-if="materials && materials.length > 0" class="coin-list__material-filter">
-      <span class="coin-list__filter-label" id="material-filter-label">材质筛选：</span>
+      <span id="material-filter-label" class="coin-list__filter-label">材质筛选：</span>
       <el-checkbox-group
         v-model="selectedMaterials"
         size="default"
@@ -177,12 +177,7 @@ watch(
       <el-skeleton :rows="6" animated />
     </div>
 
-    <el-result
-      v-else-if="coinsError"
-      icon="error"
-      title="加载失败"
-      sub-title="请刷新页面重试"
-    />
+    <el-result v-else-if="coinsError" icon="error" title="加载失败" sub-title="请刷新页面重试" />
 
     <el-empty
       v-else-if="isFilterResultEmpty"
@@ -197,18 +192,10 @@ watch(
       </template>
     </el-empty>
 
-    <el-empty
-      v-else-if="filteredCoins.length === 0"
-      description="暂无钱币数据"
-    />
+    <el-empty v-else-if="filteredCoins.length === 0" description="暂无钱币数据" />
 
     <div v-else class="coin-list__grid">
-      <CoinCard
-        v-for="coin in filteredCoins"
-        :key="coin.id"
-        :coin="coin"
-        compare-mode
-      />
+      <CoinCard v-for="coin in filteredCoins" :key="coin.id" :coin="coin" compare-mode />
     </div>
 
     <footer v-if="hasContent" class="coin-list__footer">

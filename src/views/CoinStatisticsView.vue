@@ -41,12 +41,7 @@ const pieChartData = computed(() => {
       <el-skeleton :rows="8" animated />
     </div>
 
-    <el-result
-      v-else-if="isError"
-      icon="error"
-      title="加载失败"
-      sub-title="请刷新页面重试"
-    />
+    <el-result v-else-if="isError" icon="error" title="加载失败" sub-title="请刷新页面重试" />
 
     <template v-else>
       <div class="statistics-view__stats-cards">

@@ -3,19 +3,22 @@ import { computed } from 'vue'
 import CoinCard from '@/components/CoinCard.vue'
 import type { Coin } from '@/types/coin'
 
-const props = withDefaults(defineProps<{
-  coins: Coin[]
-  loading?: boolean
-  title?: string
-  subtitle?: string
-  emptyDescription?: string
-  headingId?: string
-}>(), {
-  title: '相似形制推荐',
-  subtitle: '同朝代形制参考',
-  emptyDescription: '暂无相似形制',
-  headingId: '',
-})
+const props = withDefaults(
+  defineProps<{
+    coins: Coin[]
+    loading?: boolean
+    title?: string
+    subtitle?: string
+    emptyDescription?: string
+    headingId?: string
+  }>(),
+  {
+    title: '相似形制推荐',
+    subtitle: '同朝代形制参考',
+    emptyDescription: '暂无相似形制',
+    headingId: '',
+  },
+)
 
 const resolvedHeadingId = computed(() => {
   if (props.headingId) return props.headingId
@@ -26,11 +29,7 @@ const shouldRender = computed(() => props.loading || props.coins.length > 0)
 </script>
 
 <template>
-  <section
-    v-if="shouldRender"
-    class="similar-coins"
-    :aria-labelledby="resolvedHeadingId"
-  >
+  <section v-if="shouldRender" class="similar-coins" :aria-labelledby="resolvedHeadingId">
     <h2 :id="resolvedHeadingId" class="similar-coins__title">{{ title }}</h2>
     <p class="similar-coins__subtitle">{{ subtitle }}</p>
 

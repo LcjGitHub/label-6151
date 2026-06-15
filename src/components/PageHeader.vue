@@ -60,9 +60,7 @@ function goStatistics() {
     <template v-if="layout === 'center'">
       <div class="page-header__top">
         <div v-if="showBack" class="page-header__back">
-          <el-button type="primary" plain :icon="ArrowLeft" @click="goBack">
-            返回列表
-          </el-button>
+          <el-button type="primary" plain :icon="ArrowLeft" @click="goBack"> 返回列表 </el-button>
         </div>
         <div class="page-header__title-wrap">
           <slot name="title">
@@ -73,13 +71,7 @@ function goStatistics() {
           </slot>
         </div>
         <div class="page-header__actions">
-          <el-button
-            v-if="showTimeline"
-            type="primary"
-            plain
-            :icon="Timer"
-            @click="goTimeline"
-          >
+          <el-button v-if="showTimeline" type="primary" plain :icon="Timer" @click="goTimeline">
             朝代年表
           </el-button>
           <el-button
@@ -114,16 +106,8 @@ function goStatistics() {
     <template v-else-if="layout === 'left'">
       <div class="page-header__left-nav">
         <slot name="default">
-          <el-button v-if="showBack" text @click="goBack">
-            ← 返回列表
-          </el-button>
-          <el-button
-            v-if="showTimeline"
-            type="primary"
-            plain
-            :icon="Timer"
-            @click="goTimeline"
-          >
+          <el-button v-if="showBack" text @click="goBack"> ← 返回列表 </el-button>
+          <el-button v-if="showTimeline" type="primary" plain :icon="Timer" @click="goTimeline">
             朝代年表
           </el-button>
           <slot name="extra" />
@@ -135,9 +119,7 @@ function goStatistics() {
       <div class="page-header__inner">
         <div class="page-header__back">
           <slot name="left">
-            <el-button v-if="showBack" text @click="goBack">
-              ← 返回列表
-            </el-button>
+            <el-button v-if="showBack" text @click="goBack"> ← 返回列表 </el-button>
           </slot>
         </div>
         <div class="page-header__title-area">
@@ -149,13 +131,7 @@ function goStatistics() {
           </slot>
         </div>
         <div class="page-header__actions">
-          <el-button
-            v-if="showTimeline"
-            type="primary"
-            plain
-            :icon="Timer"
-            @click="goTimeline"
-          >
+          <el-button v-if="showTimeline" type="primary" plain :icon="Timer" @click="goTimeline">
             朝代年表
           </el-button>
           <el-button

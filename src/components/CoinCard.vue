@@ -5,13 +5,16 @@ import type { Coin } from '@/types/coin'
 import { useCompare } from '@/composables/useCompare'
 import { useFavorites } from '@/composables/useFavorites'
 
-const props = withDefaults(defineProps<{
-  coin: Coin
-  compareMode?: boolean
-  showFavorite?: boolean
-}>(), {
-  showFavorite: true,
-})
+const props = withDefaults(
+  defineProps<{
+    coin: Coin
+    compareMode?: boolean
+    showFavorite?: boolean
+  }>(),
+  {
+    showFavorite: true,
+  },
+)
 
 const { isSelected, isFull, toggleCompare } = useCompare()
 const { isFavorite, toggleFavorite } = useFavorites()
@@ -53,13 +56,7 @@ function handleFavoriteClick(e: Event) {
 
     <router-link :to="`/coin/${coin.id}`" class="coin-card">
       <div class="coin-card__image">
-        <el-image
-          :src="coin.imageUrl"
-          :alt="coin.name"
-          fit="cover"
-          lazy
-          class="coin-card__img"
-        >
+        <el-image :src="coin.imageUrl" :alt="coin.name" fit="cover" lazy class="coin-card__img">
           <template #placeholder>
             <div class="coin-card__placeholder">加载中…</div>
           </template>
@@ -138,7 +135,9 @@ function handleFavoriteClick(e: Event) {
   overflow: hidden;
   background: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   text-decoration: none;
   color: inherit;
 }

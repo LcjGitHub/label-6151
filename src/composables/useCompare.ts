@@ -16,9 +16,7 @@ export function useCompare() {
 
   /** 已选钱币列表（保持加入顺序） */
   const selectedCoins = computed(() =>
-    compareCoinIds.value
-      .map((id) => compareCoinMap.get(id))
-      .filter((coin): coin is Coin => !!coin),
+    compareCoinIds.value.map((id) => compareCoinMap.get(id)).filter((coin): coin is Coin => !!coin),
   )
 
   /**

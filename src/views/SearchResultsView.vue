@@ -27,13 +27,7 @@ const hasKeyword = computed(() => keyword.value.trim().length > 0)
 
 <template>
   <div class="search-results">
-    <PageHeader
-      variant="card"
-      layout="split"
-      show-back
-      show-timeline
-      show-favorites
-    >
+    <PageHeader variant="card" layout="split" show-back show-timeline show-favorites>
       <template #title>
         <h1 class="page-header__title">
           <template v-if="hasKeyword">搜索结果</template>
@@ -43,19 +37,15 @@ const hasKeyword = computed(() => keyword.value.trim().length > 0)
       <template #subtitle>
         <p class="page-header__subtitle">
           <template v-if="hasKeyword">
-            关键词：<em>{{ keyword }}</em> · 找到 <span class="search-results__count">{{ matchCount }}</span> 枚
+            关键词：<em>{{ keyword }}</em> · 找到
+            <span class="search-results__count">{{ matchCount }}</span> 枚
           </template>
-          <template v-else>
-            在顶部搜索栏输入关键词开始搜索
-          </template>
+          <template v-else> 在顶部搜索栏输入关键词开始搜索 </template>
         </p>
       </template>
     </PageHeader>
 
-    <el-empty
-      v-if="!hasKeyword"
-      description="请在顶部搜索栏输入钱币名称、面文或背文进行搜索"
-    >
+    <el-empty v-if="!hasKeyword" description="请在顶部搜索栏输入钱币名称、面文或背文进行搜索">
       <template #image>
         <div class="search-results__guide-icon">🔍</div>
       </template>
@@ -68,10 +58,7 @@ const hasKeyword = computed(() => keyword.value.trim().length > 0)
 
       <el-result v-else-if="isError" icon="error" title="搜索失败" sub-title="请刷新页面重试" />
 
-      <el-empty
-        v-else-if="!hasResults"
-        description="未找到匹配的钱币，请尝试其他关键词"
-      >
+      <el-empty v-else-if="!hasResults" description="未找到匹配的钱币，请尝试其他关键词">
         <template #image>
           <div class="search-results__empty-icon">🔍</div>
         </template>

@@ -35,12 +35,7 @@ function handleDynastyClick(dynasty: string) {
       <el-skeleton :rows="8" animated />
     </div>
 
-    <el-result
-      v-else-if="isError"
-      icon="error"
-      title="加载失败"
-      sub-title="请刷新页面重试"
-    />
+    <el-result v-else-if="isError" icon="error" title="加载失败" sub-title="请刷新页面重试" />
 
     <div v-else class="dynasty-timeline__list">
       <button

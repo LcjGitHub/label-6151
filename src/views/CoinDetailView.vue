@@ -6,7 +6,12 @@ import { Star, StarFilled, ArrowLeft, ArrowRight } from '@element-plus/icons-vue
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
 import PageHeader from '@/components/PageHeader.vue'
-import { useCoinDetailQuery, useSimilarCoinsQuery, useSameMaterialCoinsQuery, useAdjacentCoinsQuery } from '@/composables/useCoinQueries'
+import {
+  useCoinDetailQuery,
+  useSimilarCoinsQuery,
+  useSameMaterialCoinsQuery,
+  useAdjacentCoinsQuery,
+} from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 
 const props = defineProps<{
@@ -19,7 +24,8 @@ const idRef = toRef(props, 'id')
 const { data: coin, isLoading, isError } = useCoinDetailQuery(idRef)
 const coinRef = computed(() => coin.value)
 const { data: similarCoins, isLoading: similarLoading } = useSimilarCoinsQuery(coinRef)
-const { data: sameMaterialCoins, isLoading: sameMaterialLoading } = useSameMaterialCoinsQuery(coinRef)
+const { data: sameMaterialCoins, isLoading: sameMaterialLoading } =
+  useSameMaterialCoinsQuery(coinRef)
 const { data: adjacentIds, isLoading: adjacentLoading } = useAdjacentCoinsQuery(idRef)
 
 const { isFavorite, toggleFavorite } = useFavorites()
@@ -70,10 +76,22 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 <template>
   <div class="coin-detail">
     <PageHeader layout="left" show-back show-timeline>
-      <el-button text :icon="ArrowLeft" :disabled="!hasPrev" aria-label="上一枚钱币" @click="goPrev">
+      <el-button
+        text
+        :icon="ArrowLeft"
+        :disabled="!hasPrev"
+        aria-label="上一枚钱币"
+        @click="goPrev"
+      >
         上一枚
       </el-button>
-      <el-button text :icon="ArrowRight" :disabled="!hasNext" aria-label="下一枚钱币" @click="goNext">
+      <el-button
+        text
+        :icon="ArrowRight"
+        :disabled="!hasNext"
+        aria-label="下一枚钱币"
+        @click="goNext"
+      >
         下一枚
       </el-button>
     </PageHeader>
@@ -137,9 +155,7 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
             <el-descriptions-item label="背文">
               <span class="coin-detail__text-highlight">{{ coin.reverse }}</span>
             </el-descriptions-item>
-            <el-descriptions-item label="直径">
-              {{ coin.diameter }} mm
-            </el-descriptions-item>
+            <el-descriptions-item label="直径"> {{ coin.diameter }} mm </el-descriptions-item>
             <el-descriptions-item label="材质">
               {{ coin.material }}
             </el-descriptions-item>

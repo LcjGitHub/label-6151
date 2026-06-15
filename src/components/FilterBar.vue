@@ -31,7 +31,7 @@ function handleKeywordInput(val: string) {
 <template>
   <div class="filter-bar" role="group" aria-label="钱币筛选">
     <div v-if="showKeywordSearch" class="filter-bar__row filter-bar__row--search">
-      <span class="filter-bar__label" id="keyword-filter-label">关键词搜索：</span>
+      <span id="keyword-filter-label" class="filter-bar__label">关键词搜索：</span>
       <el-input
         :model-value="keyword"
         placeholder="输入名称、面文或背文…"
@@ -44,7 +44,7 @@ function handleKeywordInput(val: string) {
     </div>
 
     <div v-if="showDynastyFilter" class="filter-bar__row">
-      <span class="filter-bar__label" id="dynasty-filter-label">朝代筛选：</span>
+      <span id="dynasty-filter-label" class="filter-bar__label">朝代筛选：</span>
       <el-radio-group
         :model-value="selectedDynasty"
         size="default"

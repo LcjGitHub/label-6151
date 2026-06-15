@@ -102,12 +102,7 @@ watch(count, (newCount) => {
           <thead>
             <tr>
               <th class="coin-compare__th coin-compare__th--field" scope="col">对比项</th>
-              <th
-                v-for="coin in displayCoins"
-                :key="coin.id"
-                class="coin-compare__th"
-                scope="col"
-              >
+              <th v-for="coin in displayCoins" :key="coin.id" class="coin-compare__th" scope="col">
                 <div class="coin-compare__col-header">
                   <el-image
                     :src="coin.imageUrl"
@@ -119,8 +114,8 @@ watch(count, (newCount) => {
                   <button
                     type="button"
                     class="coin-compare__col-remove"
-                    @click="handleRemove(coin.id, coin.name)"
                     :aria-label="`从对比中移除${coin.name}`"
+                    @click="handleRemove(coin.id, coin.name)"
                   >
                     <el-icon><Close /></el-icon>
                     <span>移除</span>
@@ -130,11 +125,7 @@ watch(count, (newCount) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="field in comparisonFields"
-              :key="field.key"
-              class="coin-compare__row"
-            >
+            <tr v-for="field in comparisonFields" :key="field.key" class="coin-compare__row">
               <th class="coin-compare__td coin-compare__td--field" scope="row">
                 {{ field.label }}
               </th>
