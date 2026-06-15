@@ -76,6 +76,11 @@ export function useSimilarCoinsQuery(coin: Ref<Coin | undefined>) {
   })
 }
 
+/**
+ * 模糊搜索钱币
+ * 按名称、面文、背文进行不区分大小写的包含匹配
+ * @param keyword - 搜索关键词（响应式）
+ */
 export function useSearchQuery(keyword: Ref<string>) {
   return useQuery({
     queryKey: computed(() => coinKeys.search(keyword.value)),

@@ -69,6 +69,11 @@ export async function fetchDynastyTimeline(): Promise<DynastyItem[]> {
   }))
 }
 
+/**
+ * 模糊搜索钱币
+ * 按名称、面文、背文进行不区分大小写的包含匹配
+ * @param keyword - 搜索关键词
+ */
 export async function searchCoins(keyword: string): Promise<Coin[]> {
   await delay(MOCK_DELAY)
   const kw = keyword.trim().toLowerCase()

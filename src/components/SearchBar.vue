@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Search } from '@element-plus/icons-vue'
 
@@ -7,14 +7,24 @@ const router = useRouter()
 const route = useRoute()
 const keyword = ref('')
 
-if (route.name === 'search' && route.query.q) {
-  keyword.value = route.query.q as string
-}
+watch(
+  () => route.query.q,
+  (val) => {
+    keyword.value = (val as string) || ''
+  },
+  { immediate: true },
+)
 
 function handleSearch() {
   const q = keyword.value.trim()
   if (!q) return
   router.push({ name: 'search', query: { q } })
+}
+
+function handleClear() {
+  if (route.name === 'search') {
+    router.replace({ name: 'search', query: {} })
+  }
 }
 </script>
 
@@ -27,7 +37,7 @@ function handleSearch() {
         clearable
         :prefix-icon="Search"
         @keyup.enter="handleSearch"
-        @clear="handleSearch"
+        @clear="handleClear"
       >
         <template #append>
           <el-button :icon="Search" @click="handleSearch">搜索</el-button>
