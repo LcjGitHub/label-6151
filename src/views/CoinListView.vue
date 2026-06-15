@@ -37,6 +37,35 @@ const { selectedDynasty, selectedMaterials, keyword, filteredCoins, hasActiveFil
 
 const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
+function validateDynastyParam(val: unknown): string {
+  const dynastyStr = typeof val === 'string' ? val : ''
+  if (!dynastyStr) return ''
+  if (dynasties.value && dynasties.value.includes(dynastyStr)) {
+    return dynastyStr
+  }
+  return ''
+}
+
+function clearInvalidDynastyParam() {
+  const { dynasty, ...rest } = route.query
+  router.replace({ query: rest })
+}
+
+watch(
+  () => dynasties.value,
+  (newDynasties) => {
+    if (!newDynasties) return
+    const paramDynasty = route.query.dynasty
+    if (!paramDynasty) return
+    const valid = validateDynastyParam(paramDynasty)
+    if (!valid) {
+      selectedDynasty.value = ''
+      clearInvalidDynastyParam()
+    }
+  },
+  { immediate: true },
+)
+
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
 
 const isFilterResultEmpty = computed(
@@ -77,8 +106,12 @@ watch(keyword, (val) => {
 watch(
   () => route.query.dynasty,
   (val) => {
-    if (val !== selectedDynasty.value) {
-      selectedDynasty.value = (val as string) || ''
+    const valid = validateDynastyParam(val)
+    if (valid !== selectedDynasty.value) {
+      selectedDynasty.value = valid
+    }
+    if (val && !valid) {
+      clearInvalidDynastyParam()
     }
   },
 )
