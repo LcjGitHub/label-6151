@@ -4,6 +4,7 @@ import {
   fetchAdjacentCoinIds,
   fetchCoinById,
   fetchCoins,
+  fetchDiameterRange,
   fetchDynasties,
   fetchDynastyTimeline,
   fetchMaterials,
@@ -21,6 +22,7 @@ export const coinKeys = {
   materials: ['materials'] as const,
   timeline: ['dynasties', 'timeline'] as const,
   statistics: ['statistics'] as const,
+  diameterRange: ['diameterRange'] as const,
   detail: (id: string) => ['coins', id] as const,
   adjacent: (id: string) => ['coins', id, 'adjacent'] as const,
   similar: (id: string) => ['coins', id, 'similar'] as const,
@@ -141,5 +143,12 @@ export function useStatisticsQuery() {
   return useQuery({
     queryKey: coinKeys.statistics,
     queryFn: fetchStatistics,
+  })
+}
+
+export function useDiameterRangeQuery() {
+  return useQuery({
+    queryKey: coinKeys.diameterRange,
+    queryFn: fetchDiameterRange,
   })
 }

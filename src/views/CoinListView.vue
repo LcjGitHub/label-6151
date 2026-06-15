@@ -6,7 +6,7 @@ import CoinCard from '@/components/CoinCard.vue'
 import CompareBar from '@/components/CompareBar.vue'
 import FilterBar from '@/components/FilterBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
-import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery } from '@/composables/useCoinQueries'
+import { useCoinsQuery, useDynastiesQuery, useMaterialsQuery, useDiameterRangeQuery } from '@/composables/useCoinQueries'
 import { useCompare } from '@/composables/useCompare'
 import { useCoinFilter } from '@/composables/useCoinFilter'
 
@@ -16,6 +16,7 @@ const router = useRouter()
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
 const { data: materials } = useMaterialsQuery()
+const { data: diameterExtremes } = useDiameterRangeQuery()
 
 const { count: compareCount } = useCompare()
 
@@ -27,8 +28,8 @@ const initialMaterials = (() => {
 })()
 const initialKeyword = (route.query.keyword as string) || ''
 
-const { selectedDynasty, selectedMaterials, keyword, filteredCoins, hasActiveFilters } =
-  useCoinFilter(coins, {
+const { selectedDynasty, selectedMaterials, keyword, diameterRange, filteredCoins, hasActiveFilters } =
+  useCoinFilter(coins, diameterExtremes, {
     dynasty: initialDynasty,
     materials: initialMaterials,
     keyword: initialKeyword,
@@ -136,6 +137,61 @@ watch(
     }
   },
 )
+
+watch(
+  () => diameterExtremes.value,
+  (extremes) => {
+    if (!extremes) return
+    const qMin = route.query.diameterMin
+    const qMax = route.query.diameterMax
+    if (qMin !== undefined && qMax !== undefined) {
+      const min = Number(qMin)
+      const max = Number(qMax)
+      if (!isNaN(min) && !isNaN(max) && min >= extremes.min && max <= extremes.max) {
+        diameterRange.value = [min, max]
+        return
+      }
+    }
+    diameterRange.value = [extremes.min, extremes.max]
+  },
+  { immediate: true },
+)
+
+watch(diameterRange, (val) => {
+  if (!diameterExtremes.value) return
+  const [min, max] = val
+  const isDefault = min === diameterExtremes.value.min && max === diameterExtremes.value.max
+  if (isDefault) {
+    const { diameterMin: _min, diameterMax: _max, ...rest } = route.query
+    router.replace({ query: rest })
+  } else {
+    router.replace({ query: { ...route.query, diameterMin: String(min), diameterMax: String(max) } })
+  }
+})
+
+watch(
+  () => route.query.diameterMin as string | undefined,
+  () => {
+    if (!diameterExtremes.value) return
+    const qMin = route.query.diameterMin
+    const qMax = route.query.diameterMax
+    if (qMin !== undefined && qMax !== undefined) {
+      const min = Number(qMin)
+      const max = Number(qMax)
+      const [curMin, curMax] = diameterRange.value
+      if (min !== curMin || max !== curMax) {
+        if (!isNaN(min) && !isNaN(max) && min >= diameterExtremes.value.min && max <= diameterExtremes.value.max) {
+          diameterRange.value = [min, max]
+        }
+      }
+    } else {
+      const [curMin, curMax] = diameterRange.value
+      if (curMin !== diameterExtremes.value.min || curMax !== diameterExtremes.value.max) {
+        diameterRange.value = [diameterExtremes.value.min, diameterExtremes.value.max]
+      }
+    }
+  },
+)
 </script>
 
 <template>
@@ -172,6 +228,23 @@ watch(
           {{ material }}
         </el-checkbox>
       </el-checkbox-group>
+    </div>
+
+    <div v-if="diameterExtremes" class="coin-list__diameter-filter">
+      <span id="diameter-filter-label" class="coin-list__filter-label">直径筛选：</span>
+      <div class="coin-list__diameter-slider">
+        <span class="coin-list__diameter-value">{{ diameterRange[0] }}mm</span>
+        <el-slider
+          :model-value="diameterRange"
+          range
+          :min="diameterExtremes.min"
+          :max="diameterExtremes.max"
+          :step="1"
+          aria-labelledby="diameter-filter-label"
+          @update:model-value="(val: number[]) => { if (val.length === 2) diameterRange = [val[0], val[1]] }"
+        />
+        <span class="coin-list__diameter-value">{{ diameterRange[1] }}mm</span>
+      </div>
     </div>
 
     <div v-if="isLoading" class="coin-list__loading">
@@ -238,6 +311,39 @@ watch(
   font-size: 14px;
   color: #666;
   white-space: nowrap;
+}
+
+.coin-list__diameter-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding: 12px 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.coin-list__diameter-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 480px;
+}
+
+.coin-list__diameter-slider :deep(.el-slider) {
+  flex: 1;
+}
+
+.coin-list__diameter-value {
+  font-size: 13px;
+  color: #409eff;
+  white-space: nowrap;
+  min-width: 42px;
+  text-align: center;
 }
 
 .coin-list__empty-icon {

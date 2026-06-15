@@ -93,6 +93,18 @@ export async function fetchDynasties(): Promise<string[]> {
 /**
  * 获取所有材质列表（从钱币数据中去重提取）
  */
+export interface DiameterRange {
+  min: number
+  max: number
+}
+
+export async function fetchDiameterRange(): Promise<DiameterRange> {
+  await delay(MOCK_DELAY)
+  const coins = coinsData as Coin[]
+  const diameters = coins.map((c) => c.diameter)
+  return { min: Math.min(...diameters), max: Math.max(...diameters) }
+}
+
 export async function fetchMaterials(): Promise<string[]> {
   await delay(MOCK_DELAY)
   const materialSet = new Set((coinsData as Coin[]).map((c) => c.material))

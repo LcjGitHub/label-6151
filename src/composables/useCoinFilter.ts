@@ -1,36 +1,53 @@
-import { computed, ref, type Ref } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import type { Coin } from '@/types/coin'
+import type { DiameterRange } from '@/api/coins'
 
-/**
- * 钱币筛选状态接口 */
 export interface CoinFilterState {
   selectedDynasty: Ref<string>
   selectedMaterials: Ref<string[]>
   keyword: Ref<string>
+  diameterRange: Ref<[number, number]>
 }
 
-/**
- * 钱币筛选组合式函数
- * 统一处理朝代、材质、关键词三类筛选的组合逻辑，支持按名称、面文、背文进行不区分大小写的包含匹配
- * @param coins - 钱币列表（响应式）
- * @param initialState - 初始筛选状态
- * @returns 筛选状态与方法
- */
 export function useCoinFilter(
   coins: Ref<Coin[] | undefined>,
+  diameterExtremes: Ref<DiameterRange | undefined>,
   initialState: Partial<{
     dynasty: string
     materials: string[]
     keyword: string
+    diameterRange: [number, number]
   }> = {},
 ) {
   const selectedDynasty = ref<string>(initialState.dynasty || '')
   const selectedMaterials = ref<string[]>(initialState.materials || [])
   const keyword = ref<string>(initialState.keyword || '')
+  const diameterRange = ref<[number, number]>(
+    initialState.diameterRange || [0, 0],
+  )
 
-  /**
-   * 组合筛选后的钱币列表
-   */
+  const isDiameterInitialized = ref(false)
+
+  watch(
+    () => diameterExtremes.value,
+    (extremes) => {
+      if (!extremes || isDiameterInitialized.value) return
+      if (initialState.diameterRange) {
+        isDiameterInitialized.value = true
+        return
+      }
+      diameterRange.value = [extremes.min, extremes.max]
+      isDiameterInitialized.value = true
+    },
+    { immediate: true },
+  )
+
+  const isDiameterFilterActive = computed(() => {
+    if (!diameterExtremes.value || !isDiameterInitialized.value) return false
+    const [min, max] = diameterRange.value
+    return min !== diameterExtremes.value.min || max !== diameterExtremes.value.max
+  })
+
   const filteredCoins = computed(() => {
     if (!coins.value) return []
 
@@ -50,33 +67,37 @@ export function useCoinFilter(
         if (!matchName && !matchObverse && !matchReverse) return false
       }
 
+      if (isDiameterFilterActive.value) {
+        const [min, max] = diameterRange.value
+        if (coin.diameter < min || coin.diameter > max) return false
+      }
+
       return true
     })
   })
 
-  /**
-   * 是否存在活跃的筛选条件
-   */
   const hasActiveFilters = computed(
     () =>
       !!selectedDynasty.value ||
       selectedMaterials.value.length > 0 ||
-      keyword.value.trim().length > 0,
+      keyword.value.trim().length > 0 ||
+      isDiameterFilterActive.value,
   )
 
-  /**
-   * 重置所有筛选条件
-   */
   function resetFilters() {
     selectedDynasty.value = ''
     selectedMaterials.value = []
     keyword.value = ''
+    if (diameterExtremes.value) {
+      diameterRange.value = [diameterExtremes.value.min, diameterExtremes.value.max]
+    }
   }
 
   return {
     selectedDynasty,
     selectedMaterials,
     keyword,
+    diameterRange,
     filteredCoins,
     hasActiveFilters,
     resetFilters,
