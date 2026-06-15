@@ -21,7 +21,7 @@ const selectedMaterials = ref<string[]>(
 
 const { data: coins, isLoading: coinsLoading, isError: coinsError } = useCoinsQuery()
 const { data: dynasties, isLoading: dynastiesLoading } = useDynastiesQuery()
-const { data: materials, isLoading: materialsLoading } = useMaterialsQuery()
+const { data: materials } = useMaterialsQuery()
 
 const { count: compareCount } = useCompare()
 const { count: favoriteCount } = useFavorites()
@@ -36,7 +36,7 @@ const filteredCoins = computed(() => {
   })
 })
 
-const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value || materialsLoading.value)
+const isLoading = computed(() => coinsLoading.value || dynastiesLoading.value)
 
 const hasContent = computed(() => !isLoading.value && filteredCoins.value.length > 0)
 
@@ -111,31 +111,41 @@ watch(
       <p class="coin-list__desc">按朝代浏览中国历代钱币形制</p>
     </header>
 
-    <div class="coin-list__filter">
-      <span class="coin-list__filter-label">朝代筛选：</span>
-      <el-radio-group v-model="selectedDynasty" size="default">
-        <el-radio-button label="">全部</el-radio-button>
-        <el-radio-button
-          v-for="dynasty in dynasties"
-          :key="dynasty"
-          :label="dynasty"
+    <div class="coin-list__filter" role="group" aria-label="钱币筛选">
+      <div class="coin-list__filter-row">
+        <span class="coin-list__filter-label" id="dynasty-filter-label">朝代筛选：</span>
+        <el-radio-group
+          v-model="selectedDynasty"
+          size="default"
+          aria-labelledby="dynasty-filter-label"
         >
-          {{ dynasty }}
-        </el-radio-button>
-      </el-radio-group>
-    </div>
-
-    <div v-if="materials && materials.length > 0" class="coin-list__filter coin-list__filter--sub">
-      <span class="coin-list__filter-label">材质筛选：</span>
-      <el-checkbox-group v-model="selectedMaterials" size="default">
-        <el-checkbox
-          v-for="material in materials"
-          :key="material"
-          :label="material"
+          <el-radio-button label="">全部</el-radio-button>
+          <el-radio-button
+            v-for="dynasty in dynasties"
+            :key="dynasty"
+            :label="dynasty"
+          >
+            {{ dynasty }}
+          </el-radio-button>
+        </el-radio-group>
+      </div>
+      <div v-if="materials && materials.length > 0" class="coin-list__filter-row">
+        <span class="coin-list__filter-label" id="material-filter-label">材质筛选：</span>
+        <el-checkbox-group
+          v-model="selectedMaterials"
+          size="default"
+          aria-labelledby="material-filter-label"
         >
-          {{ material }}
-        </el-checkbox>
-      </el-checkbox-group>
+          <el-checkbox
+            v-for="material in materials"
+            :key="material"
+            :label="material"
+            :aria-label="`材质：${material}`"
+          >
+            {{ material }}
+          </el-checkbox>
+        </el-checkbox-group>
+      </div>
     </div>
 
     <div v-if="isLoading" class="coin-list__loading">
@@ -220,8 +230,7 @@ watch(
 
 .coin-list__filter {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 28px;
   padding: 16px 20px;
@@ -230,9 +239,11 @@ watch(
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
-.coin-list__filter--sub {
-  margin-top: -20px;
-  margin-bottom: 28px;
+.coin-list__filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
 }
 
 .coin-list__filter-label {

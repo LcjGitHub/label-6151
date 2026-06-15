@@ -44,6 +44,9 @@ export function useDynastiesQuery() {
   })
 }
 
+/**
+ * 获取材质列表
+ */
 export function useMaterialsQuery() {
   return useQuery({
     queryKey: coinKeys.materials,

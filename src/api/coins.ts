@@ -55,6 +55,9 @@ export async function fetchDynasties(): Promise<string[]> {
     .filter((name) => availableDynasties.has(name))
 }
 
+/**
+ * 获取所有材质列表（从钱币数据中去重提取）
+ */
 export async function fetchMaterials(): Promise<string[]> {
   await delay(MOCK_DELAY)
   const materialSet = new Set((coinsData as Coin[]).map((c) => c.material))
