@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, DataLine, Coin, Histogram } from '@element-plus/icons-vue'
+import { ArrowLeft, DataLine, Coin, Histogram, StarFilled, Timer } from '@element-plus/icons-vue'
 import BarChart from '@/components/BarChart.vue'
 import PieChart from '@/components/PieChart.vue'
 import { useStatisticsQuery } from '@/composables/useCoinQueries'
+import { useFavorites } from '@/composables/useFavorites'
 
 const router = useRouter()
 const { data: statistics, isLoading, isError } = useStatisticsQuery()
+const { count: favoriteCount } = useFavorites()
 
 const barChartData = computed(() => {
   if (!statistics.value) return []
@@ -31,14 +33,35 @@ const pieChartData = computed(() => {
   <div class="statistics-view">
     <header class="statistics-view__header">
       <div class="statistics-view__header-top">
-        <el-button
-          type="primary"
-          plain
-          :icon="ArrowLeft"
-          @click="router.push('/')"
-        >
-          返回列表
-        </el-button>
+        <div class="statistics-view__header-left">
+          <el-button
+            type="primary"
+            plain
+            :icon="ArrowLeft"
+            @click="router.push('/')"
+          >
+            返回列表
+          </el-button>
+        </div>
+        <div class="statistics-view__header-buttons">
+          <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
+            朝代年表
+          </el-button>
+          <el-button
+            type="primary"
+            plain
+            :icon="StarFilled"
+            @click="router.push('/favorites')"
+          >
+            我的收藏
+            <el-badge
+              v-if="favoriteCount > 0"
+              :value="favoriteCount"
+              :max="99"
+              class="statistics-view__badge"
+            />
+          </el-button>
+        </div>
       </div>
       <h1 class="statistics-view__title">形制统计概览</h1>
       <p class="statistics-view__desc">从古钱币数据看形制分布与时代特征</p>
@@ -114,8 +137,24 @@ const pieChartData = computed(() => {
 
 .statistics-view__header-top {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
+}
+
+.statistics-view__header-left {
+  flex-shrink: 0;
+}
+
+.statistics-view__header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.statistics-view__badge {
+  margin-left: 6px;
 }
 
 .statistics-view__title {

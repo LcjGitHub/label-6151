@@ -26,14 +26,20 @@ const radius = 80
 const slices = computed(() => {
   let startAngle = -Math.PI / 2
   return props.data.map((d, index) => {
-    const angle = (d.value / total.value) * Math.PI * 2
+    const angle = total.value > 0 ? (d.value / total.value) * Math.PI * 2 : 0
     const endAngle = startAngle + angle
     const x1 = center + radius * Math.cos(startAngle)
     const y1 = center + radius * Math.sin(startAngle)
     const x2 = center + radius * Math.cos(endAngle)
     const y2 = center + radius * Math.sin(endAngle)
     const largeArc = angle > Math.PI ? 1 : 0
-    const path = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+
+    let path = `M ${center} ${center}`
+    if (total.value === 1 && d.value === 1) {
+      path += ` m -${radius} 0 a ${radius} ${radius} 0 1 0 ${radius * 2} 0 a ${radius} ${radius} 0 1 0 -${radius * 2} 0`
+    } else if (d.value > 0) {
+      path += ` L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+    }
 
     const midAngle = startAngle + angle / 2
     const labelRadius = radius * 0.65
@@ -55,14 +61,20 @@ const slices = computed(() => {
     }
   })
 })
+
+const chartAriaLabel = computed(() => {
+  if (props.data.length === 0) return '饼图，暂无数据'
+  const parts = props.data.map((d) => `${d.label}${d.ratio}%，共${d.value}枚`)
+  return `饼图，${props.title || '数据'}，共${props.data.length}项：${parts.join('；')}`
+})
 </script>
 
 <template>
-  <div class="pie-chart">
-    <h3 v-if="title" class="pie-chart__title">{{ title }}</h3>
+  <figure class="pie-chart" :aria-label="chartAriaLabel" role="img">
+    <figcaption v-if="title" class="pie-chart__title">{{ title }}</figcaption>
     <div class="pie-chart__content">
       <div class="pie-chart__chart-wrap">
-        <svg :viewBox="`0 0 ${viewBoxSize} ${viewBoxSize}`" class="pie-chart__svg">
+        <svg :viewBox="`0 0 ${viewBoxSize} ${viewBoxSize}`" class="pie-chart__svg" focusable="false">
           <g>
             <path
               v-for="slice in slices"
@@ -70,27 +82,30 @@ const slices = computed(() => {
               :d="slice.path"
               :fill="slice.color"
               class="pie-chart__slice"
+              :aria-label="`${slice.label}，占比${slice.ratio}%，共${slice.value}枚`"
+              role="img"
             />
           </g>
         </svg>
       </div>
-      <div class="pie-chart__legend">
-        <div
+      <ul class="pie-chart__legend" aria-label="饼图图例">
+        <li
           v-for="slice in slices"
           :key="slice.label"
           class="pie-chart__legend-item"
         >
-          <span class="pie-chart__legend-dot" :style="{ backgroundColor: slice.color }" />
+          <span class="pie-chart__legend-dot" :style="{ backgroundColor: slice.color }" aria-hidden="true" />
           <span class="pie-chart__legend-label">{{ slice.label }}</span>
           <span class="pie-chart__legend-value">{{ slice.ratio }}%</span>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
-  </div>
+  </figure>
 </template>
 
 <style scoped>
 .pie-chart {
+  margin: 0;
   background: #fff;
   border-radius: 12px;
   padding: 20px 24px;
@@ -139,6 +154,9 @@ const slices = computed(() => {
 }
 
 .pie-chart__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   flex: 1;
   display: flex;
   flex-direction: column;

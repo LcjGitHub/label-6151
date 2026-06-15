@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Timer } from '@element-plus/icons-vue'
+import { DataLine, Delete, Timer } from '@element-plus/icons-vue'
 import CoinCard from '@/components/CoinCard.vue'
 import { useCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
@@ -60,6 +60,14 @@ async function handleClearAll() {
             @click="router.push('/timeline')"
           >
             朝代年表
+          </el-button>
+          <el-button
+            type="primary"
+            plain
+            :icon="DataLine"
+            @click="router.push('/statistics')"
+          >
+            统计概览
           </el-button>
           <el-button
             type="danger"
