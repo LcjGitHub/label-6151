@@ -46,6 +46,9 @@ export async function fetchAdjacentCoinIds(id: string): Promise<AdjacentCoinIds>
   await delay(MOCK_DELAY)
   const coins = coinsData as Coin[]
   const index = coins.findIndex((c) => c.id === id)
+  if (index === -1) {
+    return { prevId: null, nextId: null }
+  }
   return {
     prevId: index > 0 ? coins[index - 1].id : null,
     nextId: index < coins.length - 1 ? coins[index + 1].id : null,

@@ -18,36 +18,50 @@ const idRef = toRef(props, 'id')
 const { data: coin, isLoading, isError } = useCoinDetailQuery(idRef)
 const coinRef = computed(() => coin.value)
 const { data: similarCoins, isLoading: similarLoading } = useSimilarCoinsQuery(coinRef)
-const { data: adjacentIds } = useAdjacentCoinsQuery(idRef)
+const { data: adjacentIds, isLoading: adjacentLoading } = useAdjacentCoinsQuery(idRef)
 
 const { isFavorite, toggleFavorite } = useFavorites()
 
 const isFavorited = computed(() => (coin.value ? isFavorite(coin.value.id) : false))
 
-const hasPrev = computed(() => adjacentIds.value?.prevId != null)
-const hasNext = computed(() => adjacentIds.value?.nextId != null)
+const hasPrev = computed(() => adjacentLoading.value || adjacentIds.value?.prevId != null)
+const hasNext = computed(() => adjacentLoading.value || adjacentIds.value?.nextId != null)
 
+/**
+ * 导航到上一枚钱币
+ */
 function goPrev() {
   const prevId = adjacentIds.value?.prevId
   if (prevId) router.push({ name: 'coin-detail', params: { id: prevId } })
 }
 
+/**
+ * 导航到下一枚钱币
+ */
 function goNext() {
   const nextId = adjacentIds.value?.nextId
   if (nextId) router.push({ name: 'coin-detail', params: { id: nextId } })
 }
 
+/**
+ * 切换当前钱币的收藏状态
+ */
 function handleToggleFavorite() {
   if (!coin.value) return
   const favorited = toggleFavorite(coin.value)
   ElMessage.success(favorited ? '已添加到收藏' : '已取消收藏')
 }
 
+/**
+ * 格式化铸造年份显示
+ * @param mintYear - 原始年份字符串
+ */
 function formatMintYear(mintYear?: string): string {
   if (!mintYear) return '不详'
   return mintYear
 }
 
+/** 页面加载时间（演示 dayjs 使用） */
 const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
 </script>
 
@@ -57,11 +71,11 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
       <el-button text @click="router.push('/')">
         ← 返回列表
       </el-button>
-      <el-button text :icon="ArrowLeft" :disabled="!hasPrev" @click="goPrev">
+      <el-button text :icon="ArrowLeft" :disabled="!hasPrev" aria-label="上一枚钱币" @click="goPrev">
         上一枚
       </el-button>
-      <el-button text :disabled="!hasNext" @click="goNext">
-        下一枚 <el-icon><ArrowRight /></el-icon>
+      <el-button text :icon="ArrowRight" :disabled="!hasNext" aria-label="下一枚钱币" @click="goNext">
+        下一枚
       </el-button>
       <el-button type="primary" plain :icon="Timer" @click="router.push('/timeline')">
         朝代年表

@@ -78,6 +78,11 @@ export function useCoinDetailQuery(id: Ref<string>) {
   })
 }
 
+/**
+ * 获取相邻钱币 ID
+ * 根据模拟数据中的默认顺序，返回前一枚和后一枚的钱币 ID
+ * @param id - 当前钱币 ID（响应式）
+ */
 export function useAdjacentCoinsQuery(id: Ref<string>) {
   return useQuery({
     queryKey: computed(() => coinKeys.adjacent(id.value)),
