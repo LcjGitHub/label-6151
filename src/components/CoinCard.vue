@@ -5,11 +5,13 @@ import type { Coin } from '@/types/coin'
 import { useCompare } from '@/composables/useCompare'
 import { useFavorites } from '@/composables/useFavorites'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   coin: Coin
   compareMode?: boolean
   showFavorite?: boolean
-}>()
+}>(), {
+  showFavorite: true,
+})
 
 const { isSelected, isFull, toggleCompare } = useCompare()
 const { isFavorite, toggleFavorite } = useFavorites()
@@ -36,7 +38,7 @@ function handleFavoriteClick(e: Event) {
 <template>
   <div class="coin-card-wrapper">
     <div
-      v-if="showFavorite !== false"
+      v-if="showFavorite"
       class="coin-card__favorite"
       role="button"
       :aria-label="favorited ? '取消收藏' : '添加收藏'"

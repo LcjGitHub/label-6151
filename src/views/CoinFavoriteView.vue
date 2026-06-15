@@ -81,9 +81,6 @@ async function handleClearAll() {
       v-else-if="favoriteCoins.length === 0"
       description="暂无收藏的钱币"
     >
-      <template #image>
-        <el-empty description="快去收藏你喜欢的钱币吧~" />
-      </template>
       <el-button type="primary" @click="router.push('/')">
         去浏览
       </el-button>
