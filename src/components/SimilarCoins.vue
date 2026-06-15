@@ -2,22 +2,29 @@
 import CoinCard from '@/components/CoinCard.vue'
 import type { Coin } from '@/types/coin'
 
-defineProps<{
+withDefaults(defineProps<{
   coins: Coin[]
   loading?: boolean
-}>()
+  title?: string
+  subtitle?: string
+  emptyDescription?: string
+}>(), {
+  title: '相似形制推荐',
+  subtitle: '同朝代形制参考',
+  emptyDescription: '暂无相似形制',
+})
 </script>
 
 <template>
   <section class="similar-coins">
-    <h2 class="similar-coins__title">相似形制推荐</h2>
-    <p class="similar-coins__subtitle">同朝代形制参考</p>
+    <h2 class="similar-coins__title">{{ title }}</h2>
+    <p class="similar-coins__subtitle">{{ subtitle }}</p>
 
     <div v-if="loading" class="similar-coins__loading">
       <el-skeleton :rows="3" animated />
     </div>
 
-    <el-empty v-else-if="coins.length === 0" description="暂无相似形制" />
+    <el-empty v-else-if="coins.length === 0" :description="emptyDescription" />
 
     <div v-else class="similar-coins__grid">
       <CoinCard v-for="coin in coins" :key="coin.id" :coin="coin" />

@@ -68,6 +68,18 @@ export async function fetchSimilarCoins(coin: Coin, limit = 3): Promise<Coin[]> 
 }
 
 /**
+ * 获取同材质推荐（排除当前钱币，最多 limit 条）
+ * @param coin - 当前钱币
+ * @param limit - 推荐数量，默认 3
+ */
+export async function fetchSameMaterialCoins(coin: Coin, limit = 3): Promise<Coin[]> {
+  await delay(MOCK_DELAY)
+  return (coinsData as Coin[])
+    .filter((c) => c.material === coin.material && c.id !== coin.id)
+    .slice(0, limit)
+}
+
+/**
  * 获取所有朝代列表（按历史先后顺序排列）
  */
 export async function fetchDynasties(): Promise<string[]> {

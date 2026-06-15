@@ -7,6 +7,7 @@ import {
   fetchDynasties,
   fetchDynastyTimeline,
   fetchMaterials,
+  fetchSameMaterialCoins,
   fetchSimilarCoins,
   fetchStatistics,
   searchCoins,
@@ -23,6 +24,7 @@ export const coinKeys = {
   detail: (id: string) => ['coins', id] as const,
   adjacent: (id: string) => ['coins', id, 'adjacent'] as const,
   similar: (id: string) => ['coins', id, 'similar'] as const,
+  sameMaterial: (id: string) => ['coins', id, 'sameMaterial'] as const,
   search: (keyword: string) => ['coins', 'search', keyword] as const,
 }
 
@@ -101,6 +103,20 @@ export function useSimilarCoinsQuery(coin: Ref<Coin | undefined>) {
       coin.value ? coinKeys.similar(coin.value.id) : ['coins', 'similar', 'empty'],
     ),
     queryFn: () => fetchSimilarCoins(coin.value!),
+    enabled: computed(() => !!coin.value),
+  })
+}
+
+/**
+ * 获取同材质推荐
+ * @param coin - 当前钱币（响应式）
+ */
+export function useSameMaterialCoinsQuery(coin: Ref<Coin | undefined>) {
+  return useQuery({
+    queryKey: computed(() =>
+      coin.value ? coinKeys.sameMaterial(coin.value.id) : ['coins', 'sameMaterial', 'empty'],
+    ),
+    queryFn: () => fetchSameMaterialCoins(coin.value!),
     enabled: computed(() => !!coin.value),
   })
 }

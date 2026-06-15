@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus'
 import { Star, StarFilled, Timer, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import SimilarCoins from '@/components/SimilarCoins.vue'
-import { useCoinDetailQuery, useSimilarCoinsQuery, useAdjacentCoinsQuery } from '@/composables/useCoinQueries'
+import { useCoinDetailQuery, useSimilarCoinsQuery, useSameMaterialCoinsQuery, useAdjacentCoinsQuery } from '@/composables/useCoinQueries'
 import { useFavorites } from '@/composables/useFavorites'
 
 const props = defineProps<{
@@ -18,6 +18,7 @@ const idRef = toRef(props, 'id')
 const { data: coin, isLoading, isError } = useCoinDetailQuery(idRef)
 const coinRef = computed(() => coin.value)
 const { data: similarCoins, isLoading: similarLoading } = useSimilarCoinsQuery(coinRef)
+const { data: sameMaterialCoins, isLoading: sameMaterialLoading } = useSameMaterialCoinsQuery(coinRef)
 const { data: adjacentIds, isLoading: adjacentLoading } = useAdjacentCoinsQuery(idRef)
 
 const { isFavorite, toggleFavorite } = useFavorites()
@@ -159,6 +160,17 @@ const pageLoadedAt = dayjs().format('YYYY-MM-DD HH:mm')
       <SimilarCoins
         :coins="similarCoins ?? []"
         :loading="similarLoading"
+        title="同朝代推荐"
+        subtitle="同朝代形制参考"
+        empty-description="暂无同朝代钱币"
+      />
+
+      <SimilarCoins
+        :coins="sameMaterialCoins ?? []"
+        :loading="sameMaterialLoading"
+        title="同材质推荐"
+        subtitle="相同材质钱币参考"
+        empty-description="暂无同材质钱币"
       />
     </template>
   </div>
